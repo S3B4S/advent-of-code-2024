@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import yargs from "https://deno.land/x/yargs/deno.ts";
 import { existsSync } from "https://deno.land/std@0.224.0/fs/exists.ts";
 import { getDayTemplate, getTestFileTemplate } from "./templates.ts";
@@ -59,14 +57,14 @@ if (!Deno.env.get("AOC_SESSION_COOKIE")) {
 }
 
 const titleRegex =
-  /(?<=<article class="day-desc"><h2>--- Day \d+: )([\w\?\! ]*)(?= ---<\/h2>)/g;
+  /(?<=<article class="day-desc"><h2>--- Day \d+: )(.*)(?= ---<\/h2>)/g;
 const exampleInputRegex = /(?<=<pre><code>)([\s\S]*?)(?=<\/code><\/pre>)/g;
 
 const urlSite = `https://adventofcode.com/${argv.y}/day/${argv.d}`;
 const urlInput = `${urlSite}/input`;
 
 const errorMessage =
-  "Puzzle inputs differ by user.  Please log in to get your puzzle input.";
+  "Puzzle inputs differ by user. Please log in to get your puzzle input.";
 
 logTable([
   ["Fetching puzzle data from", urlSite],
