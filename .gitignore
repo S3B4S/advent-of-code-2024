@@ -39,3 +39,5 @@ junit.xml
 Untitled*.ipynb
 
 ##### END https://github.com/denoland/deno/blob/main/.gitignore #####
+
+input.txt
