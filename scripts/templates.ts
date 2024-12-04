@@ -8,12 +8,12 @@ export const solvePart2 = (input: string) => {
 }
 `.trim() + '\n'
 
-export const getTestFileTemplate = (day: string, exampleInput: string) => `
+export const getTestFileTemplate = (day: string, directoryName: string, exampleInput: string) => `
 import { expect } from "jsr:@std/expect";
 import { solvePart1, solvePart2 } from "./index.ts";
 import { testWrapper } from "../utils/misc.ts";
 
-const fileInput = Deno.readTextFileSync("./03_mull-it-over/input.txt");
+const fileInput = Deno.readTextFileSync("./${directoryName}/input.txt");
 const exampleInput = \`
 ${exampleInput}
 \`.trim()
