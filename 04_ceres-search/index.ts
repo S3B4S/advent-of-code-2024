@@ -84,6 +84,62 @@ const Encoding = {
   S: 4,
 };
 
+// prettier-ignore
+enum Direction {
+  NW  = "NW", // ↖️
+  N   = "N",  // ⬆️
+  NE  = "NE", // ↗️
+  W   = "W",  // ⬅️
+  E   = "E",  // ➡️
+  SW  = "SW", // ↙️
+  S   = "S",  // ⬇️
+  SE  = "SE", // ↘️
+}
+
+type Column = number;
+type Row = number;
+type Coordinate = {
+  col: Column;
+  row: Row;
+};
+
+const relativeCoords: Record<Direction, Coordinate> = {
+  NW: {
+    col: -1,
+    row: -1,
+  },
+  N: {
+    col: 0,
+    row: -1,
+  },
+  NE: {
+    col: 1,
+    row: -1,
+  },
+  W: {
+    col: -1,
+    row: 0,
+  },
+  E: {
+    col: 1,
+    row: 0,
+  },
+  SW: {
+    col: -1,
+    row: 1,
+  },
+  S: {
+    col: 0,
+    row: 1,
+  },
+  SE: {
+    col: 1,
+    row: 1,
+  },
+};
+
+const relativeCoordsList = Object.values(relativeCoords);
+
 /**
  * Indexing columns and rows start at 0, going from left to right and top to bottom.
  * When providing coordinates, column first, then the row
@@ -135,16 +191,10 @@ class Board {
    * @TODO
    */
   neighbours(currentCoords: [number, number], distance: number = 1) {
-    const neighboursRelativeCoordinates = [
-      [-1 * distance, -1 * distance], // NW
-      [0 * distance, -1 * distance], // N
-      [1 * distance, -1 * distance], // NE
-      [-1 * distance, 0 * distance], // W
-      [1 * distance, 0 * distance], // E
-      [-1 * distance, 1 * distance], // SW
-      [0 * distance, 1 * distance], // S
-      [1 * distance, 1 * distance], // SE
-    ];
+    const neighboursRelativeCoordinates = relativeCoordsList.map((coords) => [
+      coords.col * distance,
+      coords.row * distance,
+    ]);
 
     return neighboursRelativeCoordinates
       .map((coord) => [
@@ -179,11 +229,9 @@ class Board {
 
   /**
    * Get the value of a cell.
-   * Will throw an error if the cell is out of bounds.
    * @param column - The column of the cell to get
    * @param row - The row of the cell to get
-   * @returns the value of the cell
-   * @TODO
+   * @returns the value of the cell, if outside of bounds, return undefined.
    */
   safeGetCell(column: number, row: number): number | undefined {
     if (!this.isWithinBounds(column, row)) return undefined;
