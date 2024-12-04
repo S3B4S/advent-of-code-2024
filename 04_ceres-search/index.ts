@@ -37,28 +37,34 @@ export const solvePart2 = (input: string) => {
   const board = new Board(asString, width);
 
   let count = 0;
-  board.iterateOverX((val, col, row) => {
-    const mNeighbours = board
-      .neighbours([col, row])
-      .filter(
-        (neighbour) => board.getCell(neighbour[0], neighbour[1]) === Encoding.M
-      );
-    for (const mNeighbour of mNeighbours) {
-      const relativeDirection = [mNeighbour[0] - col, mNeighbour[1] - row];
+  board.iterateOverA((val, col, row) => {
+    const relativeCoords = [
+      [-1, -1], // NW
+      [1, 1], // NE
+      [-1, 1], // SW
+      [1, -1], // SE
+    ];
 
-      if (
-        board.safeGetCell(
-          mNeighbour[0] + relativeDirection[0],
-          mNeighbour[1] + relativeDirection[1]
-        ) === Encoding.A &&
-        board.safeGetCell(
-          mNeighbour[0] + relativeDirection[0] * 2,
-          mNeighbour[1] + relativeDirection[1] * 2
-        ) === Encoding.S
-      ) {
-        count++;
-      }
-    }
+    const crossNeighbours = relativeCoords.map((coord) => [
+      coord[0] + col,
+      coord[1] + row,
+    ]);
+    const mCells = crossNeighbours.filter(
+      (x) => board.safeGetCell(x[0], x[1]) === Encoding.M
+    );
+    const sCells = crossNeighbours.filter(
+      (x) => board.safeGetCell(x[0], x[1]) === Encoding.S
+    );
+
+    if (!(mCells.length === 2 && sCells.length === 2)) return;
+
+    const firstM = mCells[0];
+    const secondM = mCells[1];
+
+    // If they're opposed to each other, this X-MAS is invalid, the M-M & S-S needs
+    // to share at least a column or a row
+    if (firstM[0] !== secondM[0] && firstM[1] !== secondM[1]) return;
+    count++;
   });
 
   return count;
@@ -97,12 +103,14 @@ class Board {
    */
   private _board: Uint8Array;
   private _xPostions: [number, number][];
+  private _aPositions: [number, number][];
   private _width: number;
 
   constructor(board: string, width: number) {
     this._board = new Uint8Array(board.length);
     // In this case I do use a traditional array, as the amount of mines is unknown at this point.
     this._xPostions = [];
+    this._aPositions = [];
     this._width = width;
 
     for (let i = 0; i < board.length; i++) {
@@ -112,6 +120,9 @@ class Board {
 
       if (board[i] === "X")
         this._xPostions.push([i % this._width, Math.floor(i / this._width)]);
+
+      if (board[i] === "A")
+        this._aPositions.push([i % this._width, Math.floor(i / this._width)]);
     }
   }
 
@@ -121,6 +132,15 @@ class Board {
   iterateOverX(callback: (value: string, column: number, row: number) => void) {
     this._xPostions.forEach(([col, row]) => {
       callback("X", col, row);
+    });
+  }
+
+  /**
+   * @TODO
+   */
+  iterateOverA(callback: (value: string, column: number, row: number) => void) {
+    this._aPositions.forEach(([col, row]) => {
+      callback("A", col, row);
     });
   }
 
