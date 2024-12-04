@@ -86,21 +86,9 @@ const Encoding = {
 
 /**
  * Indexing columns and rows start at 0, going from left to right and top to bottom.
+ * When providing coordinates, column first, then the row
  */
 class Board {
-  // The reason I'm creating this is that I can use performant storage and computation operations within this class,
-  // while at the same time exposing a more easily readable interface to consumers of this class.
-
-  /**
-   * I will be using an Uint8Array to internally represent the board, since we know beforehand:
-   * - That a cell in minesweeper can only have 1 of possible 10 states:
-   *   0 - 8: the amount of mines in the proximity of the cell (9 states)
-   *   9: a mine is present in this cell (1 state)
-   * - The total amount of cells needed
-   *
-   * Since we know the size of the array, and space needed for each element beforehand,
-   * we can use an Uint8Array for optimisation.
-   */
   private _board: Uint8Array;
   private _xPostions: [number, number][];
   private _aPositions: [number, number][];
@@ -108,7 +96,6 @@ class Board {
 
   constructor(board: string, width: number) {
     this._board = new Uint8Array(board.length);
-    // In this case I do use a traditional array, as the amount of mines is unknown at this point.
     this._xPostions = [];
     this._aPositions = [];
     this._width = width;
@@ -201,30 +188,6 @@ class Board {
   safeGetCell(column: number, row: number): number | undefined {
     if (!this.isWithinBounds(column, row)) return undefined;
     return this._board[column + row * this._width];
-  }
-
-  /**
-   * Check if a cell is a mine.
-   * @param column - The column of the cell to check
-   * @param row - The row of the cell to check
-   * @returns true if the cell is a mine, false otherwise
-   */
-  isMine(column: number, row: number): boolean {
-    return this.getCell(column, row) === Encoding.X;
-  }
-
-  /**
-   * Increment the value of a cell, but only if it's not a mine.
-   * To be used when calculating the proximities of mines.
-   * This will not throw an error if the cell is out of bounds,
-   * as the mine might be on the edge of the board.
-   * This is a mutating function.
-   * @param column - The column of the cell to increment
-   * @param row - The row of the cell to increment
-   */
-  private _incrementCell(column: number, row: number): void {
-    if (!this.isWithinBounds(column, row) || this.isMine(column, row)) return;
-    this._board[column + row * this._width]++;
   }
 
   /**
