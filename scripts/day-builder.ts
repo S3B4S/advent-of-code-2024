@@ -27,7 +27,7 @@ const argv = await yargs(Deno.args)
   `
   )
   .example(
-    "deno sd -n find-stars -d 2",
+    "deno run sd -n find-stars -d 2",
     'Creates a new directory named "02_find-stars" with the files "index.ts", "index.test.ts" and "input.txt". The last file containing the puzzle input downlaoded from AOC.'
   )
 
@@ -97,6 +97,7 @@ Promise.all([
     const indexFileTemplate = getDayTemplate();
     const testFileTemplate = getTestFileTemplate(
       formatDay(argv.d),
+      targetDir.slice(2), // remove the first './'
       (exampleInput || "").trim()
     );
 
