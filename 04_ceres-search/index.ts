@@ -4,24 +4,29 @@ export const solvePart1 = (input: string) => {
   const board = new Board(asString, width);
 
   let count = 0;
-  board.iterateOverX((val, col, row) => {
+  board.iterateOverX((val, { col, row }) => {
     const mNeighbours = board
-      .neighbours([col, row])
+      .neighbours({ col, row })
       .filter(
-        (neighbour) => board.getCell(neighbour[0], neighbour[1]) === Encoding.M
+        (neighbour) =>
+          board.getCell({ col: neighbour.col, row: neighbour.row }) ===
+          Encoding.M
       );
     for (const mNeighbour of mNeighbours) {
-      const relativeDirection = [mNeighbour[0] - col, mNeighbour[1] - row];
+      const relativeDirection = {
+        col: mNeighbour.col - col,
+        row: mNeighbour.row - row,
+      };
 
       if (
-        board.safeGetCell(
-          mNeighbour[0] + relativeDirection[0],
-          mNeighbour[1] + relativeDirection[1]
-        ) === Encoding.A &&
-        board.safeGetCell(
-          mNeighbour[0] + relativeDirection[0] * 2,
-          mNeighbour[1] + relativeDirection[1] * 2
-        ) === Encoding.S
+        board.safeGetCell({
+          col: mNeighbour.col + relativeDirection.col,
+          row: mNeighbour.row + relativeDirection.row,
+        }) === Encoding.A &&
+        board.safeGetCell({
+          col: mNeighbour.col + relativeDirection.col * 2,
+          row: mNeighbour.row + relativeDirection.row * 2,
+        }) === Encoding.S
       ) {
         count++;
       }
@@ -37,23 +42,23 @@ export const solvePart2 = (input: string) => {
   const board = new Board(asString, width);
 
   let count = 0;
-  board.iterateOverA((val, col, row) => {
-    const relativeCoords = [
-      [-1, -1], // NW
-      [1, 1], // NE
-      [-1, 1], // SW
-      [1, -1], // SE
+  board.iterateOverA((val, { col, row }) => {
+    const relativeCoordsNested = [
+      relativeCoords.NW,
+      relativeCoords.NE,
+      relativeCoords.SW,
+      relativeCoords.SE,
     ];
 
-    const crossNeighbours = relativeCoords.map((coord) => [
-      coord[0] + col,
-      coord[1] + row,
-    ]);
+    const crossNeighbours = relativeCoordsNested.map((coord) => ({
+      col: coord.col + col,
+      row: coord.row + row,
+    }));
     const mCells = crossNeighbours.filter(
-      (x) => board.safeGetCell(x[0], x[1]) === Encoding.M
+      (x) => board.safeGetCell({ col: x.col, row: x.row }) === Encoding.M
     );
     const sCells = crossNeighbours.filter(
-      (x) => board.safeGetCell(x[0], x[1]) === Encoding.S
+      (x) => board.safeGetCell({ col: x.col, row: x.row }) === Encoding.S
     );
 
     if (!(mCells.length === 2 && sCells.length === 2)) return;
@@ -63,7 +68,7 @@ export const solvePart2 = (input: string) => {
 
     // If they're opposed to each other, this X-MAS is invalid, the M-M & S-S needs
     // to share at least a column or a row
-    if (firstM[0] !== secondM[0] && firstM[1] !== secondM[1]) return;
+    if (firstM.col !== secondM.col && firstM.row !== secondM.row) return;
     count++;
   });
 
@@ -146,8 +151,8 @@ const relativeCoordsList = Object.values(relativeCoords);
  */
 class Board {
   private _board: Uint8Array;
-  private _xPostions: [number, number][];
-  private _aPositions: [number, number][];
+  private _xPostions: Coordinate[];
+  private _aPositions: Coordinate[];
   private _width: number;
 
   constructor(board: string, width: number) {
@@ -162,46 +167,54 @@ class Board {
         : 0;
 
       if (board[i] === "X")
-        this._xPostions.push([i % this._width, Math.floor(i / this._width)]);
+        this._xPostions.push({
+          col: i % this._width,
+          row: Math.floor(i / this._width),
+        });
 
       if (board[i] === "A")
-        this._aPositions.push([i % this._width, Math.floor(i / this._width)]);
+        this._aPositions.push({
+          col: i % this._width,
+          row: Math.floor(i / this._width),
+        });
     }
   }
 
   /**
    * @TODO
    */
-  iterateOverX(callback: (value: string, column: number, row: number) => void) {
-    this._xPostions.forEach(([col, row]) => {
-      callback("X", col, row);
+  iterateOverX(callback: (value: string, coord: Coordinate) => void) {
+    this._xPostions.forEach(({ col, row }) => {
+      callback("X", { col, row });
     });
   }
 
   /**
    * @TODO
    */
-  iterateOverA(callback: (value: string, column: number, row: number) => void) {
-    this._aPositions.forEach(([col, row]) => {
-      callback("A", col, row);
+  iterateOverA(callback: (value: string, coord: Coordinate) => void) {
+    this._aPositions.forEach(({ col, row }) => {
+      callback("A", { col, row });
     });
   }
 
   /**
    * @TODO
    */
-  neighbours(currentCoords: [number, number], distance: number = 1) {
-    const neighboursRelativeCoordinates = relativeCoordsList.map((coords) => [
-      coords.col * distance,
-      coords.row * distance,
-    ]);
+  neighbours(currentCoords: Coordinate, distance: number = 1) {
+    const neighboursRelativeCoordinates = relativeCoordsList.map((coords) => ({
+      col: coords.col * distance,
+      row: coords.row * distance,
+    }));
 
     return neighboursRelativeCoordinates
-      .map((coord) => [
-        coord[0] + currentCoords[0],
-        coord[1] + currentCoords[1],
-      ])
-      .filter((coord) => this.isWithinBounds(coord[0], coord[1]));
+      .map((coord) => ({
+        col: coord.col + currentCoords.col,
+        row: coord.row + currentCoords.row,
+      }))
+      .filter((coord) =>
+        this.isWithinBounds({ col: coord.col, row: coord.row })
+      );
   }
 
   /**
@@ -209,9 +222,15 @@ class Board {
    * @param column - The column of the cell to check
    * @param row - The row of the cell to check
    * @returns true if the cell is within the bounds of the board, false otherwise
+   * @TODO _width needs to be updated here
    */
-  isWithinBounds(column: number, row: number): boolean {
-    return column >= 0 && column < this._width && row >= 0 && row < this._width;
+  isWithinBounds(coord: Coordinate): boolean {
+    return (
+      coord.col >= 0 &&
+      coord.col < this._width &&
+      coord.row >= 0 &&
+      coord.row < this._width
+    );
   }
 
   /**
@@ -221,10 +240,9 @@ class Board {
    * @param row - The row of the cell to get
    * @returns the value of the cell
    */
-  getCell(column: number, row: number): number {
-    if (!this.isWithinBounds(column, row))
-      throw new Error("Cell is out of bounds");
-    return this._board[column + row * this._width];
+  getCell(coord: Coordinate): number {
+    if (!this.isWithinBounds(coord)) throw new Error("Cell is out of bounds");
+    return this._board[coord.col + coord.row * this._width];
   }
 
   /**
@@ -233,9 +251,9 @@ class Board {
    * @param row - The row of the cell to get
    * @returns the value of the cell, if outside of bounds, return undefined.
    */
-  safeGetCell(column: number, row: number): number | undefined {
-    if (!this.isWithinBounds(column, row)) return undefined;
-    return this._board[column + row * this._width];
+  safeGetCell(coord: Coordinate): number | undefined {
+    if (!this.isWithinBounds(coord)) return undefined;
+    return this._board[coord.col + coord.row * this._width];
   }
 
   /**
@@ -243,12 +261,11 @@ class Board {
    * @param callback - The callback function to be executed for each cell,
    *      receiving the value of the cell, and its column and row as arguments
    */
-  iterateOverCells(
-    callback: (value: number, column: number, row: number) => void
-  ): void {
-    for (let row = 0; row < this._width; row++) {
-      for (let column = 0; column < this._width; column++) {
-        callback(this.getCell(column, row), column, row);
+  iterateOverCells(callback: (value: number, coord: Coordinate) => void): void {
+    for (let col = 0; col < this._width; col++) {
+      for (let row = 0; row < this._width; row++) {
+        const currCoord = { col, row };
+        callback(this.getCell(currCoord), currCoord);
       }
     }
   }
