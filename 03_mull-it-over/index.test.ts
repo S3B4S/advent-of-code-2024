@@ -2,7 +2,15 @@ import { expect } from "jsr:@std/expect";
 import { solvePart1, solvePart2 } from "./index.ts";
 import { testWrapper } from "../utils/misc.ts";
 
-const fileInput = Deno.readTextFileSync("./03_mull-it-over/input.txt");
+let fileInput: string;
+try {
+  fileInput = Deno.readTextFileSync("./03_mull-it-over/input.txt");
+} catch {
+  // In GitHub Actions the `Deno.readTextFileSync` will fail, as the `input.txt` is not committed to git.
+  // So we assign an empty string, knowing that in GitHub Actions the fileInput won't be used anyway.
+  fileInput = "";
+}
+
 const exampleInput = `
 x<em>mul(2,4)</em>%&mul[3,7]!@^do_not_<em>mul(5,5)</em>+mul(32,64]then(<em>mul(11,8)mul(8,5)</em>)
 `.trim();

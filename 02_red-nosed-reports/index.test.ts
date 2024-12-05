@@ -2,7 +2,15 @@ import { expect } from "jsr:@std/expect";
 import { solvePart1, solvePart2 } from "./index.ts";
 import { testWrapper } from "../utils/misc.ts";
 
-const fileInput = Deno.readTextFileSync("./02_red-nosed-reports/input.txt");
+let fileInput: string;
+try {
+  fileInput = Deno.readTextFileSync("./02_red-nosed-reports/input.txt");
+} catch {
+  // In GitHub Actions the `Deno.readTextFileSync` will fail, as the `input.txt` is not committed to git.
+  // So we assign an empty string, knowing that in GitHub Actions the fileInput won't be used anyway.
+  fileInput = "";
+}
+
 const exampleInput = `
 7 6 4 2 1
 1 2 7 8 9
