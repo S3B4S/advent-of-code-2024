@@ -30,12 +30,13 @@ jobs:
         with:
           deno-version: v2.x
 
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
       # - name: Verify formatting
       #   run: deno fmt --check
 
       - name: Run linter
         run: deno lint
 
+      # Only run test that use the example input.
+      # The "real" input is not pushed to git.
       - name: Run tests
-        run: deno test -A
+        run: deno test -A --filter "/[Ee]xample/"
