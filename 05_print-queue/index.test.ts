@@ -35,16 +35,16 @@ const exampleInput = `
 `.trim();
 
 testWrapper("Day 05", () => {
-  Deno.test.ignore("Part 1 - Example input", () => {
+  Deno.test("Part 1 - Example input", () => {
     expect(solvePart1(exampleInput)).toEqual(143);
   });
 
   Deno.test("Part 1 - File input", () => {
-    expect(solvePart1(fileInput)).toEqual(0);
+    expect(solvePart1(fileInput)).toEqual(6041);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input", () => {
+    expect(solvePart2(exampleInput)).toEqual(123);
   });
 
   Deno.test.ignore("Part 2 - File input", () => {
