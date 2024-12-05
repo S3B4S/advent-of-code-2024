@@ -47,43 +47,6 @@ export const solvePart1 = (input: string) => {
   return count;
 };
 
-const _solvePart2Alternative = (input: string) => {
-  const sam = "SAM";
-  const mas = "MAS";
-
-  const rows = input.trim().split("\n");
-  const matrixWidth = rows[0].length;
-  const matrixHeight = rows.length;
-
-  let count = 0;
-
-  for (let i = 0; i < matrixHeight; i++) {
-    const safeDown = i + 2 < matrixHeight;
-
-    for (let j = 0; j < matrixWidth; j++) {
-      if (!(rows[i][j] === "S" || rows[i][j] === "M")) {
-        continue;
-      }
-
-      const safeRight = j + 2 < matrixWidth;
-
-      if (!(safeDown && safeRight)) continue;
-
-      const toSouthEast = rows[i][j] + rows[i + 1][j + 1] + rows[i + 2][j + 2];
-      const toNorthEast = rows[i + 2][j] + rows[i + 1][j + 1] + rows[i][j + 2];
-
-      if (
-        (toSouthEast === sam || toSouthEast === mas) &&
-        (toNorthEast === sam || toNorthEast === mas)
-      ) {
-        count++;
-      }
-    }
-  }
-
-  return count;
-};
-
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const asString = input.trim().replaceAll("\n", "");
@@ -121,6 +84,43 @@ export const solvePart2 = (input: string) => {
     if (firstM.col !== secondM.col && firstM.row !== secondM.row) return;
     count++;
   });
+
+  return count;
+};
+
+const _solvePart2Alternative = (input: string) => {
+  const sam = "SAM";
+  const mas = "MAS";
+
+  const rows = input.trim().split("\n");
+  const matrixWidth = rows[0].length;
+  const matrixHeight = rows.length;
+
+  let count = 0;
+
+  for (let i = 0; i < matrixHeight; i++) {
+    const safeDown = i + 2 < matrixHeight;
+
+    for (let j = 0; j < matrixWidth; j++) {
+      if (!(rows[i][j] === "S" || rows[i][j] === "M")) {
+        continue;
+      }
+
+      const safeRight = j + 2 < matrixWidth;
+
+      if (!(safeDown && safeRight)) continue;
+
+      const toSouthEast = rows[i][j] + rows[i + 1][j + 1] + rows[i + 2][j + 2];
+      const toNorthEast = rows[i + 2][j] + rows[i + 1][j + 1] + rows[i][j + 2];
+
+      if (
+        (toSouthEast === sam || toSouthEast === mas) &&
+        (toNorthEast === sam || toNorthEast === mas)
+      ) {
+        count++;
+      }
+    }
+  }
 
   return count;
 };
