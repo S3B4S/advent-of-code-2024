@@ -4,7 +4,7 @@ import { getDayTemplate, getTestFileTemplate } from "./templates.ts";
 import { getBorderCharacters, table } from "table";
 import chalk from "chalk";
 
-const logTable = (content: any) => {
+const logTable = (content: unknown[][]) => {
   console.log(
     table(content, {
       border: getBorderCharacters("norc"),

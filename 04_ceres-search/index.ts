@@ -13,7 +13,7 @@ export const solvePart1 = (input: string) => {
   const board = new Board(asString, width, encoding);
 
   let count = 0;
-  board.iterateOver("X", (val, { col, row }) => {
+  board.iterateOver("X", ({ col, row }) => {
     const mNeighbours = board
       .neighbours({ col, row })
       .filter(
@@ -46,7 +46,7 @@ export const solvePart1 = (input: string) => {
   return count;
 };
 
-const solvePart2Alternative = (input: string) => {
+const _solvePart2Alternative = (input: string) => {
   const sam = "SAM";
   const mas = "MAS";
 
@@ -91,7 +91,7 @@ export const solvePart2 = (input: string) => {
 
   let count = 0;
 
-  board.iterateOver("A", (val, { col, row }) => {
+  board.iterateOver("A", ({ col, row }) => {
     const relativeCoordsNested = [
       relativeCoords.NW,
       relativeCoords.NE,
@@ -219,9 +219,9 @@ class Board<K extends PropertyKey, V extends number> {
   /**
    * @TODO
    */
-  iterateOver(key: K, callback: (value: string, coord: Coordinate) => void) {
+  iterateOver(key: K, callback: (coord: Coordinate) => void) {
     this._positionsByKey[key].forEach(({ col, row }) => {
-      callback("X", { col, row });
+      callback({ col, row });
     });
   }
 
