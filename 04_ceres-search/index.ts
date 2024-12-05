@@ -1,16 +1,25 @@
+import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
+
+const encoding = new BidirectionalMap<PropertyKey, number>({
+  X: 1,
+  M: 2,
+  A: 3,
+  S: 4,
+});
+
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const asString = input.trim().replaceAll("\n", "");
-  const board = new Board(asString, width);
+  const board = new Board(asString, width, encoding);
 
   let count = 0;
-  board.iterateOverX((val, { col, row }) => {
+  board.iterateOver("X", (val, { col, row }) => {
     const mNeighbours = board
       .neighbours({ col, row })
       .filter(
         (neighbour) =>
           board.getCell({ col: neighbour.col, row: neighbour.row }) ===
-          Encoding.M
+          encoding.get("M")
       );
 
     for (const mNeighbour of mNeighbours) {
@@ -23,11 +32,11 @@ export const solvePart1 = (input: string) => {
         board.safeGetCell({
           col: mNeighbour.col + relativeDirection.col,
           row: mNeighbour.row + relativeDirection.row,
-        }) === Encoding.A &&
+        }) === encoding.get("A") &&
         board.safeGetCell({
           col: mNeighbour.col + relativeDirection.col * 2,
           row: mNeighbour.row + relativeDirection.row * 2,
-        }) === Encoding.S
+        }) === encoding.get("S")
       ) {
         count++;
       }
@@ -77,11 +86,12 @@ const solvePart2Alternative = (input: string) => {
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const asString = input.trim().replaceAll("\n", "");
-  const board = new Board(asString, width);
+
+  const board = new Board(asString, width, encoding);
 
   let count = 0;
 
-  board.iterateOverA((val, { col, row }) => {
+  board.iterateOver("A", (val, { col, row }) => {
     const relativeCoordsNested = [
       relativeCoords.NW,
       relativeCoords.NE,
@@ -94,10 +104,10 @@ export const solvePart2 = (input: string) => {
       row: coord.row + row,
     }));
     const mCells = crossNeighbours.filter(
-      (x) => board.safeGetCell({ col: x.col, row: x.row }) === Encoding.M
+      (x) => board.safeGetCell({ col: x.col, row: x.row }) === encoding.get("M")
     );
     const sCells = crossNeighbours.filter(
-      (x) => board.safeGetCell({ col: x.col, row: x.row }) === Encoding.S
+      (x) => board.safeGetCell({ col: x.col, row: x.row }) === encoding.get("S")
     );
 
     if (!(mCells.length === 2 && sCells.length === 2)) return;
@@ -112,20 +122,6 @@ export const solvePart2 = (input: string) => {
   });
 
   return count;
-};
-
-const Decoding = {
-  1: "X",
-  2: "M",
-  3: "A",
-  4: "S",
-};
-
-const Encoding = {
-  X: 1,
-  M: 2,
-  A: 3,
-  S: 4,
 };
 
 // prettier-ignore
@@ -187,53 +183,45 @@ const relativeCoordsList = Object.values(relativeCoords);
 /**
  * Indexing columns and rows start at 0, going from left to right and top to bottom.
  * When providing coordinates, column first, then the row
+ *
+ * If an encoding is passed, and there are characters in the board not present in the encoding,
+ * it will be converted to a blank space, represented by a 255 (the maximum value)
  */
-class Board {
+class Board<K extends PropertyKey, V extends number> {
   private _board: Uint8Array;
-  private _xPostions: Coordinate[];
-  private _aPositions: Coordinate[];
+  private _positionsByKey: Record<K, Coordinate[]>;
   private _width: number;
 
-  constructor(board: string, width: number) {
+  constructor(board: string, width: number, encoding?: BidirectionalMap<K, V>) {
     this._board = new Uint8Array(board.length);
-    this._xPostions = [];
-    this._aPositions = [];
+    this._positionsByKey = {} as Record<K, Coordinate[]>;
     this._width = width;
 
     for (let i = 0; i < board.length; i++) {
-      this._board[i] = Encoding[board[i] as keyof typeof Encoding]
-        ? Encoding[board[i] as keyof typeof Encoding]
+      this._board[i] = encoding?.has(board[i] as K)
+        ? encoding.get(board[i] as K)!
         : 0;
 
-      if (board[i] === "X")
-        this._xPostions.push({
-          col: i % this._width,
-          row: Math.floor(i / this._width),
-        });
+      // @TOOD this as is not correct
+      if (encoding?.has(board[i] as K)) {
+        if (!this._positionsByKey[board[i] as K]) {
+          this._positionsByKey[board[i] as K] = [];
+        }
 
-      if (board[i] === "A")
-        this._aPositions.push({
+        this._positionsByKey[board[i] as K].push({
           col: i % this._width,
           row: Math.floor(i / this._width),
         });
+      }
     }
   }
 
   /**
    * @TODO
    */
-  iterateOverX(callback: (value: string, coord: Coordinate) => void) {
-    this._xPostions.forEach(({ col, row }) => {
+  iterateOver(key: K, callback: (value: string, coord: Coordinate) => void) {
+    this._positionsByKey[key].forEach(({ col, row }) => {
       callback("X", { col, row });
-    });
-  }
-
-  /**
-   * @TODO
-   */
-  iterateOverA(callback: (value: string, coord: Coordinate) => void) {
-    this._aPositions.forEach(({ col, row }) => {
-      callback("A", { col, row });
     });
   }
 
@@ -318,8 +306,9 @@ class Board {
     let output = "";
     for (let i = 0; i < this._board.length; i++) {
       if (i % this._width === 0) output += "\n";
-      output += Decoding[this._board[i] as keyof typeof Decoding]
-        ? Decoding[this._board[i] as keyof typeof Decoding]
+      output += encoding.getKey(this._board[i])
+        ? // @TODO
+          (encoding.getKey(this._board[i]) as string)
         : this._board[i];
     }
     return output;
