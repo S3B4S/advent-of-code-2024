@@ -56,6 +56,13 @@ export const relativeCoords: Record<Direction, Coordinate> = {
 
 export const relativeCoordsList = Object.values(relativeCoords);
 
+export const addCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
+  return {
+    col: coordA.col + coordB.col,
+    row: coordA.row + coordB.row,
+  };
+};
+
 /**
  * Indexing columns and rows start at 0, going from left to right and top to bottom.
  * When providing coordinates, column first, then the row

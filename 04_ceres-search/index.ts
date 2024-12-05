@@ -1,5 +1,10 @@
 import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
-import { Board, Coordinate, relativeCoords } from "../utils/board.ts";
+import {
+  addCoordinates,
+  Board,
+  Coordinate,
+  relativeCoords,
+} from "../utils/board.ts";
 import { partition } from "ramda";
 
 const encoding = new BidirectionalMap<PropertyKey, number>({
@@ -48,36 +53,30 @@ export const solvePart1 = (input: string) => {
   return count;
 };
 
+const crossDirections = [
+  relativeCoords.NW,
+  relativeCoords.NE,
+  relativeCoords.SW,
+  relativeCoords.SE,
+];
+
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const asString = input.trim().replaceAll("\n", "");
-
   const board = new Board(asString, width, encoding);
 
   let count = 0;
 
-  board.iterateOver("A", ({ col, row }) => {
-    const relativeCoordsNested = [
-      relativeCoords.NW,
-      relativeCoords.NE,
-      relativeCoords.SW,
-      relativeCoords.SE,
-    ];
+  board.iterateOver("A", (centre) => {
+    const crossNeighbours = crossDirections.map((crossDirection) =>
+      addCoordinates(centre, crossDirection)
+    );
 
-    const crossNeighbours = relativeCoordsNested.map((coord) => ({
-      col: coord.col + col,
-      row: coord.row + row,
-    }));
-
-    if (
-      crossNeighbours.some(
-        (el) =>
-          ![encoding.get("M"), encoding.get("S")].includes(
-            board.safeGetCell(el)
-          )
-      )
-    ) {
-      return;
+    // prettier-ignore
+    // If any of the neighbours are not an M or S, skip it
+    for (const nb of crossNeighbours) {
+      const el = board.safeGetCell(nb)
+      if(!(el === encoding.get('M') || el === encoding.get('S'))) return;
     }
 
     const [mCells, sCells] = partition((el: Coordinate) => {
@@ -86,12 +85,11 @@ export const solvePart2 = (input: string) => {
 
     if (!(mCells.length === 2 && sCells.length === 2)) return;
 
-    const firstM = mCells[0];
-    const secondM = mCells[1];
-
     // If they're opposed to each other, this X-MAS is invalid, the M-M & S-S needs
     // to share at least a column or a row
-    if (firstM.col !== secondM.col && firstM.row !== secondM.row) return;
+    if (mCells[0].col !== mCells[1].col && mCells[0].row !== mCells[1].row)
+      return;
+
     count++;
   });
 
