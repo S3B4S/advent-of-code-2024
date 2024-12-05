@@ -1,5 +1,6 @@
 import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
-import { Board, relativeCoords } from "../utils/board.ts";
+import { Board, Coordinate, relativeCoords } from "../utils/board.ts";
+import { partition } from "ramda";
 
 const encoding = new BidirectionalMap<PropertyKey, number>({
   X: 1,
@@ -67,12 +68,21 @@ export const solvePart2 = (input: string) => {
       col: coord.col + col,
       row: coord.row + row,
     }));
-    const mCells = crossNeighbours.filter(
-      (x) => board.safeGetCell({ col: x.col, row: x.row }) === encoding.get("M")
-    );
-    const sCells = crossNeighbours.filter(
-      (x) => board.safeGetCell({ col: x.col, row: x.row }) === encoding.get("S")
-    );
+
+    if (
+      crossNeighbours.some(
+        (el) =>
+          ![encoding.get("M"), encoding.get("S")].includes(
+            board.safeGetCell(el)
+          )
+      )
+    ) {
+      return;
+    }
+
+    const [mCells, sCells] = partition((el: Coordinate) => {
+      return board.safeGetCell(el) === encoding.get("M");
+    }, crossNeighbours);
 
     if (!(mCells.length === 2 && sCells.length === 2)) return;
 

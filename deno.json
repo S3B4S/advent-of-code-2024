@@ -10,6 +10,7 @@
     "yargs": "https://deno.land/x/yargs/deno.ts",
     "chalk": "npm:chalk@^5.3.0",
     "table": "npm:table@^6.8.2",
-    "figlet": "npm:figlet@^1.6.0"
+    "figlet": "npm:figlet@^1.6.0",
+    "ramda": "npm:ramda@^0.30.1"
   }
 }
