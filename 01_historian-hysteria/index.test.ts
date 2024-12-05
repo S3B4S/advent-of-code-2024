@@ -10,6 +10,7 @@ try {
   // So we assign an empty string, knowing that in GitHub Actions the fileInput won't be used anyway.
   fileInput = "";
 }
+
 const exampleInput = `
 3   4
 4   3
