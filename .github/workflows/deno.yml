@@ -37,6 +37,6 @@ jobs:
         run: deno lint
 
       # Only run test that use the example input.
-      # The "real" input is not pushed to git.
+      # The "real" input is not committed to git.
       - name: Run tests
         run: deno test -A --filter "/[Ee]xample/"
