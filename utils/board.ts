@@ -101,10 +101,16 @@ export class Board<K extends PropertyKey, V extends number> {
     }
   }
 
+  // The encoded val is passed here
+  setCell(val: number, coord: Coordinate) {
+    this._board[coord.col + coord.row * this._width] = val;
+  }
+
   /**
    * @TODO
    */
   iterateOver(key: K, callback: (coord: Coordinate) => void) {
+    if (!this._positionsByKey[key]) return;
     this._positionsByKey[key].forEach(({ col, row }) => {
       callback({ col, row });
     });
@@ -187,13 +193,13 @@ export class Board<K extends PropertyKey, V extends number> {
    * It will include newlines to separate the rows.
    * @returns the string representation of the board
    */
-  toString(): string {
+  toString(encoding?: BidirectionalMap): string {
     let output = "";
     for (let i = 0; i < this._board.length; i++) {
       if (i % this._width === 0) output += "\n";
-      output += this._encoding?.getKey(this._board[i] as V)
+      output += encoding?.getKey(this._board[i] as V)
         ? // @TODO
-          (this._encoding?.getKey(this._board[i] as V) as string)
+          (encoding?.getKey(this._board[i] as V) as string)
         : this._board[i];
     }
     return output;
