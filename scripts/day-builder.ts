@@ -3,6 +3,7 @@ import { existsSync } from "https://deno.land/std@0.224.0/fs/exists.ts";
 import { getDayTemplate, getTestFileTemplate } from "./templates.ts";
 import { getBorderCharacters, table } from "table";
 import chalk from "chalk";
+// import { writeAllSync } from "jsr:@std/io/write-all";
 
 const logTable = (content: unknown[][]) => {
   console.log(
@@ -51,7 +52,9 @@ const argv = await yargs(Deno.args)
 
 if (!Deno.env.get("AOC_SESSION_COOKIE")) {
   console.error(
-    "AOC_SESSION_COOKIE environment variable is not set, please set it to your AOC session cookie. This is required to download the puzzle input."
+    chalk.red(
+      "❌ AOC_SESSION_COOKIE environment variable is not set, please set it to your AOC session cookie. This is required to download the puzzle input."
+    )
   );
   Deno.exit(1);
 }
@@ -70,6 +73,11 @@ logTable([
   ["Fetching puzzle data from", urlSite],
   ["Fetching puzzle input from", urlInput],
 ]);
+
+// Terminal escape sequences
+// const ESC = "\x1b[";
+
+// writeAllSync(Deno.stdout, new TextEncoder().encode("Fetching!"));
 
 Promise.all([
   fetch(urlSite, {
@@ -100,6 +108,8 @@ Promise.all([
       targetDir.slice(2), // remove the first './'
       (exampleInput || "").trim()
     );
+
+    // writeAllSync(Deno.stdout, new TextEncoder().encode(ESC + "2K\r"));
 
     logTable([
       ["Target directory", targetDir],

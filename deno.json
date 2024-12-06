@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "sd": "deno run scaffold",
+    "sd": "deno run --env-file scaffold",
     "test:CICD": "deno test -A --filter '/[Ee]xample/'",
     "scaffold": "deno run --allow-read --allow-env --allow-net --allow-write ./scripts/day-builder.ts scaffold"
   },
