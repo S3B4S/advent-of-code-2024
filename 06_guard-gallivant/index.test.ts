@@ -111,11 +111,11 @@ testWrapper("Day 06", () => {
     expect(solvePart1(fileInput)).toEqual(5101);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input", () => {
+    expect(solvePart2(exampleInput)).toEqual(6);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
+  Deno.test("Part 2 - File input", () => {
     expect(solvePart2(fileInput)).toEqual(0);
   });
 });
