@@ -268,6 +268,20 @@ export const solvePart1 = (input: string) => {
   return Object.keys(hashMapVisited).length;
 };
 
+const directionArrows = {
+  [Direction.N]: "⬆️",
+  [Direction.E]: "➡️",
+  [Direction.S]: "⬇️",
+  [Direction.W]: "⬅️",
+};
+
+const directionNums = {
+  [Direction.N]: 10,
+  [Direction.E]: 11,
+  [Direction.S]: 12,
+  [Direction.W]: 13,
+};
+
 export const solvePart2 = (input: string) => {
   const lines = input.trim().split("\n");
   const height = lines.length;
@@ -275,381 +289,116 @@ export const solvePart2 = (input: string) => {
 
   const asString = input.replaceAll("\n", "");
 
-  const board = new Board(
-    asString,
-    width,
-    new BidirectionalMap<string, number>({
-      "^": 1,
-      "#": 2,
-    })
-  );
+  const encoding = new BidirectionalMap<string, number>({
+    ".": 0,
+    "^": 1,
+    "#": 2,
+    T: 10,
+    ">": 11,
+    v: 12,
+    "<": 13,
+  });
+
+  const board = new Board(asString, width, encoding);
 
   const hashmapObstacles: Record<string, Coordinate> = {};
 
-  const hashmapColsSorted: Record<number, Coordinate[]> = {};
-  const hashmapRowsSorted: Record<number, Coordinate[]> = {};
-
   board.iterateOver("#", (coord) => {
     hashmapObstacles[stringifyCoord(coord)] = coord;
-
-    if (!hashmapColsSorted[coord.col]) hashmapColsSorted[coord.col] = [];
-    hashmapColsSorted[coord.col].push(coord);
-
-    if (!hashmapRowsSorted[coord.row]) hashmapRowsSorted[coord.row] = [];
-    hashmapRowsSorted[coord.row].push(coord);
   });
 
-  for (const keyC of Object.keys(hashmapColsSorted)) {
-    hashmapColsSorted[Number(keyC)].sort((a, b) => a.row - b.row);
-  }
+  // const nextStep = (currentCoord: Coordinate, direction: Direction) => {
+  //   const peekNextStep =
+  // }
 
-  for (const keyC of Object.keys(hashmapRowsSorted)) {
-    hashmapRowsSorted[Number(keyC)].sort((a, b) => a.col - b.col);
-  }
-
-  const hashMapVisited: Record<
-    string,
-    { coord: Coordinate; dir: Direction; stepCount: number }
-  > = {};
-  const hashMapTurningpoints: Record<
-    string,
-    { coord: Coordinate; dir: Direction; stepCount: number }
-  > = {};
-
-  let stepCount = 0;
   board.iterateOver("^", (coord) => {
-    let currentPosition = { ...coord };
     let currentDirection = Direction.N;
 
-    hashMapVisited[stringifyCoordDirection(currentPosition, currentDirection)] =
-      {
-        coord: currentPosition,
-        dir: currentDirection,
-        stepCount: stepCount,
-      };
-    stepCount++;
+    const pawn = new Pawn(board, coord);
 
-    while (true) {
-      if (
-        // Not the start
-        !(
-          currentPosition.col === coord.col && currentPosition.row === coord.row
-        )
-      ) {
-        hashMapTurningpoints[
-          stringifyCoordDirection(currentPosition, currentDirection)
-        ] = {
-          coord: currentPosition,
-          dir: currentDirection,
-          stepCount: stepCount++,
-        };
-        // Remove turning points from visited
-        // console.log("removing turning point from visited!");
-        // console.log(stringifyCoordDirection(currentPosition, currentDirection));
-        delete hashMapVisited[
-          stringifyCoordDirection(currentPosition, Direction.N)
-        ];
-        delete hashMapVisited[
-          stringifyCoordDirection(currentPosition, Direction.E)
-        ];
-        delete hashMapVisited[
-          stringifyCoordDirection(currentPosition, Direction.S)
-        ];
-        delete hashMapVisited[
-          stringifyCoordDirection(currentPosition, Direction.W)
-        ];
-      }
+    console.log(coord);
+    console.log("coord");
 
-      const nextObject = willFace(
-        currentPosition,
-        currentDirection,
-        hashmapColsSorted,
-        hashmapRowsSorted
+    console.log(board.toString(encoding));
+
+    for (let i = 0; i < 40; i++) {
+      pawn.conditionalNextStep((coord, value) => {
+        board.setCell(
+          directionNums[currentDirection as keyof typeof directionNums],
+          pawn.currentPosition
+        );
+        console.log(pawn.currentPosition);
+        if (value === ".") return currentDirection;
+        if (value === "#") {
+          currentDirection = turn90Degrees(currentDirection);
+          return currentDirection;
+        }
+        return currentDirection;
+      }, currentDirection);
+    }
+
+    console.log(board.toString(encoding));
+
+    // console.log(pawn.currentPosition);
+    // pawn.step(Direction.E);
+    // console.log(pawn.currentPosition);
+    // pawn.step(Direction.N);
+    // console.log(pawn.currentPosition);
+  });
+
+  return 0;
+};
+
+/**
+ * A pawn is something you can place on a board and move around
+ */
+class Pawn {
+  private _board: Board<PropertyKey, number>;
+  currentPosition: Coordinate;
+
+  constructor(board: Board<PropertyKey, number>, startingPosition: Coordinate) {
+    this._board = board;
+    this.currentPosition = startingPosition;
+  }
+
+  step(direction: Direction, n: number = 1) {
+    for (let i = 0; i < n; i++) {
+      this.currentPosition = addCoordinates(
+        this.currentPosition,
+        relativeCoords[direction]
       );
-
-      if (!nextObject) {
-        // If we're gonna leave the map, just need to find the last positions explicitly
-
-        if (Direction.N === currentDirection) {
-          for (
-            let currentRow = currentPosition.row;
-            currentRow >= 0;
-            currentRow--
-          ) {
-            hashMapVisited[
-              stringifyCoordDirection(
-                { row: currentRow, col: currentPosition.col },
-                currentDirection
-              )
-            ] = {
-              coord: { row: currentRow, col: currentPosition.col },
-              dir: currentDirection,
-              stepCount: stepCount++,
-            };
-          }
-        }
-        if (Direction.S === currentDirection) {
-          for (
-            let currentRow = currentPosition.row;
-            currentRow < height;
-            currentRow++
-          ) {
-            hashMapVisited[
-              stringifyCoordDirection(
-                { row: currentRow, col: currentPosition.col },
-                currentDirection
-              )
-            ] = {
-              coord: { row: currentRow, col: currentPosition.col },
-              dir: currentDirection,
-              stepCount: stepCount++,
-            };
-          }
-        }
-        if (Direction.E === currentDirection) {
-          for (
-            let currentCol = currentPosition.col;
-            currentCol < width;
-            currentCol++
-          ) {
-            hashMapVisited[
-              stringifyCoordDirection(
-                { row: currentPosition.row, col: currentCol },
-                currentDirection
-              )
-            ] = {
-              coord: { row: currentPosition.row, col: currentCol },
-              dir: currentDirection,
-              stepCount: stepCount++,
-            };
-          }
-        }
-        if (Direction.W === currentDirection) {
-          for (
-            let currentCol = currentPosition.col;
-            currentCol >= 0;
-            currentCol--
-          ) {
-            hashMapVisited[
-              stringifyCoordDirection(
-                { row: currentPosition.row, col: currentCol },
-                currentDirection
-              )
-            ] = {
-              coord: { row: currentPosition.row, col: currentCol },
-              dir: currentDirection,
-              stepCount: stepCount++,
-            };
-          }
-        }
-
-        return;
-      }
-
-      const inBetweens = coordsBetween(currentPosition, nextObject);
-      for (const inBetween of inBetweens) {
-        hashMapVisited[stringifyCoordDirection(inBetween, currentDirection)] = {
-          coord: inBetween,
-          dir: currentDirection,
-          stepCount: stepCount++,
-        };
-      }
-
-      // There must always be some space in between
-      if (Direction.N === currentDirection) {
-        currentPosition = { col: nextObject.col, row: nextObject.row + 1 };
-      } else if (Direction.E === currentDirection) {
-        currentPosition = { col: nextObject.col - 1, row: nextObject.row };
-      } else if (Direction.S === currentDirection) {
-        currentPosition = { col: nextObject.col, row: nextObject.row - 1 };
-      } else if (Direction.W === currentDirection) {
-        currentPosition = { col: nextObject.col + 1, row: nextObject.row };
-      }
-      currentDirection = turn90Degrees(currentDirection);
-    }
-  });
-
-  // for (const vals of Object.values(hashMapTurningpoints)) {
-  //   board.setCell(8, vals.coord);
-  // }
-  // console.log(
-  //   board.toString(
-  //     new BidirectionalMap({
-  //       ".": 0,
-  //       "+": 8,
-  //       "#": 2,
-  //     })
-  //   )
-  // );
-  // console.log(hashMapTurningpoints);
-
-  // Add step count
-  // if step count of path > then turning point, we can add it to list
-
-  const obstaclesPlacedHashmap: Record<string, Coordinate> = {};
-  // let count = 0;
-
-  // console.log(hashMapTurningpoints);
-  // console.log(hashMapVisited);
-
-  // From start, only look at other turning points
-  // Only consider start without any walls around
-  board.iterateOver("^", (coord) => {
-    const currentPosition = { ...coord };
-
-    // Going eastwards
-    for (let step = currentPosition.col + 1; step < width; step++) {
-      const currStep = { col: step, row: currentPosition.row };
-
-      if (hashmapObstacles[stringifyCoord(currStep)]) {
-        break;
-      }
-
-      if (
-        hashMapTurningpoints[stringifyCoordDirection(currStep, Direction.W)]
-      ) {
-        const pos = addCoordinates(coord, relativeCoords.W);
-        obstaclesPlacedHashmap[stringifyCoord(pos)] = pos;
-      }
-    }
-  });
-
-  // console.log(count);
-
-  // console.log(hashMapVisited);
-
-  // Then hereafter, for every turning point, see how many visited paths you come across (ignoring start)
-  // let subCount = 0;
-
-  for (const vals of Object.values(hashMapTurningpoints)) {
-    const turnRight = turn90Degrees(vals.dir);
-
-    if (turnRight === Direction.N) {
-      for (let step = vals.coord.row - 1; step >= 0; step--) {
-        if (
-          hashmapObstacles[stringifyCoord({ col: vals.coord.col, row: step })]
-        )
-          break;
-
-        // Stop at objects!
-        const currStep =
-          hashMapVisited[
-            stringifyCoordDirection(
-              { col: vals.coord.col, row: step },
-              Direction.E
-            )
-          ];
-        if (
-          currStep?.dir === Direction.E &&
-          currStep.stepCount > vals.stepCount
-        ) {
-          // console.log(turnRight, vals, currStep);
-
-          const obstaclePlaced = addCoordinates(
-            currStep.coord,
-            relativeCoords.E
-          );
-          obstaclesPlacedHashmap[stringifyCoord(obstaclePlaced)] =
-            obstaclePlaced;
-        }
-      }
-    }
-
-    if (turnRight === Direction.S) {
-      for (let step = vals.coord.row + 1; step < height; step++) {
-        if (
-          hashmapObstacles[stringifyCoord({ col: vals.coord.col, row: step })]
-        )
-          break;
-
-        const currStep =
-          hashMapVisited[
-            stringifyCoordDirection(
-              { col: vals.coord.col, row: step },
-              Direction.W
-            )
-          ];
-        if (
-          currStep?.dir === Direction.W &&
-          currStep.stepCount > vals.stepCount
-        ) {
-          // console.log(turnRight, vals, currStep);
-          const obstaclePlaced = addCoordinates(
-            currStep.coord,
-            relativeCoords.W
-          );
-          obstaclesPlacedHashmap[stringifyCoord(obstaclePlaced)] =
-            obstaclePlaced;
-        }
-      }
-    }
-
-    if (turnRight === Direction.E) {
-      for (let step = vals.coord.col + 1; step < width; step++) {
-        if (
-          hashmapObstacles[stringifyCoord({ col: step, row: vals.coord.row })]
-        )
-          break;
-
-        const currStep =
-          hashMapVisited[
-            stringifyCoordDirection(
-              { col: step, row: vals.coord.row },
-              Direction.S
-            )
-          ];
-        if (
-          currStep?.dir === Direction.S &&
-          currStep.stepCount > vals.stepCount
-        ) {
-          // console.log(turnRight, vals, currStep);
-          const obstaclePlaced = addCoordinates(
-            currStep.coord,
-            relativeCoords.S
-          );
-          obstaclesPlacedHashmap[stringifyCoord(obstaclePlaced)] =
-            obstaclePlaced;
-        }
-      }
-    }
-
-    if (turnRight === Direction.W) {
-      for (let step = vals.coord.col - 1; step >= 0; step--) {
-        if (
-          hashmapObstacles[stringifyCoord({ col: step, row: vals.coord.row })]
-        )
-          break;
-
-        const currStep =
-          hashMapVisited[
-            stringifyCoordDirection(
-              { col: step, row: vals.coord.row },
-              Direction.N
-            )
-          ];
-        if (
-          currStep?.dir === Direction.N &&
-          currStep.stepCount > vals.stepCount
-        ) {
-          // console.log(turnRight, vals, currStep);
-          const obstaclePlaced = addCoordinates(
-            currStep.coord,
-            relativeCoords.N
-          );
-          obstaclesPlacedHashmap[stringifyCoord(obstaclePlaced)] =
-            obstaclePlaced;
-        }
-      }
     }
   }
 
-  // for (const obst of Object.values(obstaclesPlacedHashmap)) {
-  //   board.setCell(9, obst);
-  //   console.log(
-  //     board.toString(new BidirectionalMap({ ".": 0, "#": 2, O: 9, "^": 1 }))
-  //   );
-  //   board.setCell(0, obst);
-  // }
+  /**
+   * Peek ahead and based on the value of the upcoming tile, you can change directions
+   * @param condition
+   * @param direction
+   * @param n
+   */
+  conditionalNextStep(
+    condition: (coord: Coordinate, value: PropertyKey) => Direction,
+    direction: Direction,
+    n: number = 1
+  ) {
+    const peekNextStep = this.peekStep(direction, n);
+    const nextDirection = condition(
+      peekNextStep,
+      this._board.getCell(peekNextStep)!
+    );
+    this.step(nextDirection, n);
+  }
 
-  return Object.keys(obstaclesPlacedHashmap).length;
-};
+  /**
+   *
+   * @param direction
+   * @param n
+   */
+  peekStep(direction: Direction, n: number = 1) {
+    let result = this.currentPosition;
+    for (let i = 0; i < n; i++) {
+      result = addCoordinates(result, relativeCoords[direction]);
+    }
+    return result;
+  }
+}

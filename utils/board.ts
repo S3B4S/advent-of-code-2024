@@ -158,9 +158,11 @@ export class Board<K extends PropertyKey, V extends number> {
    * @param row - The row of the cell to get
    * @returns the value of the cell
    */
-  getCell(coord: Coordinate): number {
+  getCell(coord: Coordinate): K | undefined {
     if (!this.isWithinBounds(coord)) throw new Error("Cell is out of bounds");
-    return this._board[coord.col + coord.row * this._width];
+    return this._encoding?.getKey(
+      this._board[coord.col + coord.row * this._width] as V
+    );
   }
 
   /**
@@ -178,8 +180,11 @@ export class Board<K extends PropertyKey, V extends number> {
    * Abstracing away the double loop which performs looping over every cell in the board
    * @param callback - The callback function to be executed for each cell,
    *      receiving the value of the cell, and its column and row as arguments
+   * @TODO shouldn't be undefined
    */
-  iterateOverCells(callback: (value: number, coord: Coordinate) => void): void {
+  iterateOverCells(
+    callback: (value: K | undefined, coord: Coordinate) => void
+  ): void {
     for (let col = 0; col < this._width; col++) {
       for (let row = 0; row < this._width; row++) {
         const currCoord = { col, row };
