@@ -23,10 +23,6 @@ const exampleInput = `
 292: 11 6 16 20
 `.trim();
 
-// const exampleInput = `
-// 292: 11 6 16 20
-// `.trim();
-
 testWrapper("Day 07", () => {
   Deno.test("Part 1 - Example input", () => {
     expect(solvePart1(exampleInput)).toEqual(3749);
@@ -36,11 +32,60 @@ testWrapper("Day 07", () => {
     expect(solvePart1(fileInput)).toEqual(4364915411363);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input", () => {
+    expect(solvePart2(exampleInput)).toEqual(11387);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - Example input - All concatenation", () => {
+    expect(
+      solvePart2(`
+        147218041: 147 21 8 0 41
+      `)
+    ).toEqual(147218041);
+  });
+
+  Deno.test("Part 2 - Example input - All +", () => {
+    expect(
+      solvePart2(`
+        217: 147 21 8 0 41
+      `)
+    ).toEqual(217);
+  });
+
+  Deno.test("Part 2 - Example input - All * with 0", () => {
+    expect(
+      solvePart2(`
+        0: 147 21 8 0 41
+      `)
+    ).toEqual(0);
+  });
+
+  Deno.test("Part 2 - Example input - All *", () => {
+    expect(
+      solvePart2(`
+        1012536: 147 21 8 1 41
+      `)
+    ).toEqual(1012536);
+  });
+
+  Deno.test("Part 2 - Example input - Shouldn't accept", () => {
+    expect(
+      solvePart2(`
+        42: 147 21 8 1 41
+      `)
+    ).toEqual(0);
+  });
+
+  Deno.test("Part 2 - Example input - Don't accept partial answer", () => {
+    expect(
+      solvePart2(`
+        100: 10 10 3
+      `)
+    ).toEqual(0);
+  });
+
+  // 39150794090326 -> too high
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(38322057216320);
   });
 });
