@@ -1,41 +1,20 @@
-type Node = {
-  value: number;
-  left?: Node;
-  middle?: Node;
-  right?: Node;
-};
-
 // Right = *
 // Left = +
 const calculateChildren = (
-  node: Node,
+  currentValue: number,
   nextNumbers: number[],
   target: number
-): Node | undefined => {
-  if (node.value === target && nextNumbers.length === 0) return node;
-  if (nextNumbers.length === 0) return;
+): number | undefined => {
+  if (currentValue === target && nextNumbers.length === 0) return currentValue;
+  if (currentValue > target || nextNumbers.length === 0) return;
 
-  let resultingNode = undefined;
+  const left = currentValue * nextNumbers[0];
+  const right = currentValue + nextNumbers[0];
 
-  const resMultiplication = node.value * nextNumbers[0];
-  node.left = {
-    value: resMultiplication,
-  };
-  if (resMultiplication <= target)
-    resultingNode =
-      resultingNode ||
-      calculateChildren(node.left, nextNumbers.slice(1), target);
-
-  const resAddition = node.value + nextNumbers[0];
-  node.right = {
-    value: resAddition,
-  };
-  if (resAddition <= target)
-    resultingNode =
-      resultingNode ||
-      calculateChildren(node.right, nextNumbers.slice(1), target);
-
-  return resultingNode;
+  return (
+    calculateChildren(left, nextNumbers.slice(1), target) ||
+    calculateChildren(right, nextNumbers.slice(1), target)
+  );
 };
 
 export const solvePart1 = (input: string) => {
@@ -48,14 +27,10 @@ export const solvePart1 = (input: string) => {
       return x.split(" ").map((x) => Number(x));
     }) as [number, number[]];
 
-    const rootNode = {
-      value: numbers[0],
-    };
+    const foundTarget = calculateChildren(numbers[0], numbers.slice(1), target);
 
-    const foundTarget = calculateChildren(rootNode, numbers.slice(1), target);
-
-    if (foundTarget?.value) {
-      count += foundTarget.value;
+    if (foundTarget) {
+      count += foundTarget;
     }
   }
 
