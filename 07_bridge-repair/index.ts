@@ -66,32 +66,24 @@ export const solvePart1 = (input: string) => {
 // Middle = ||
 // Left = +
 const calculateChildrenB = (
-  node: Node,
+  currentValue: number,
   nextNumbers: number[],
   target: number
-): Node | undefined => {
-  if (node.value === target && nextNumbers.length === 0) return node;
-  if (node.value > target || nextNumbers.length === 0) return;
+): number | undefined => {
+  if (currentValue === target && nextNumbers.length === 0) return currentValue;
+  if (currentValue > target || nextNumbers.length === 0) return;
 
   const op = nextNumbers[0];
   const remainingOps = nextNumbers.slice(1);
 
-  node.left = {
-    value: node.value * op,
-  };
-
-  node.middle = {
-    value: Number(String(node.value) + String(op)),
-  };
-
-  node.right = {
-    value: node.value + op,
-  };
+  const left = currentValue * op;
+  const middle = Number(String(currentValue) + String(op));
+  const right = currentValue + op;
 
   return (
-    calculateChildrenB(node.left, remainingOps, target) ||
-    calculateChildrenB(node.middle, remainingOps, target) ||
-    calculateChildrenB(node.right, remainingOps, target)
+    calculateChildrenB(left, remainingOps, target) ||
+    calculateChildrenB(middle, remainingOps, target) ||
+    calculateChildrenB(right, remainingOps, target)
   );
 };
 
@@ -105,14 +97,14 @@ export const solvePart2 = (input: string) => {
       return x.split(" ").map((x) => Number(x));
     }) as [number, number[]];
 
-    const rootNode = {
-      value: numbers[0],
-    };
+    const foundTarget = calculateChildrenB(
+      numbers[0],
+      numbers.slice(1),
+      target
+    );
 
-    const foundTarget = calculateChildrenB(rootNode, numbers.slice(1), target);
-
-    if (foundTarget?.value) {
-      count += foundTarget.value;
+    if (foundTarget) {
+      count += foundTarget;
     }
   }
 
