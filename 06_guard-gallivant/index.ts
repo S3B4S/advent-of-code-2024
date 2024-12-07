@@ -307,10 +307,6 @@ export const solvePart2 = (input: string) => {
     hashmapObstacles[stringifyCoord(coord)] = coord;
   });
 
-  // const nextStep = (currentCoord: Coordinate, direction: Direction) => {
-  //   const peekNextStep =
-  // }
-
   board.iterateOver("^", (coord) => {
     let currentDirection = Direction.N;
 
