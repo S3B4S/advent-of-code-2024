@@ -8,6 +8,7 @@ import {
   equalCoordinates,
 } from "../utils/board.ts";
 import { HashMap } from "../utils/hashMap.ts";
+import { forEachPair } from "../utils/list.ts";
 
 const uniqueChars = (str: string) => {
   const chars = new HashMap<string>((c) => c);
@@ -66,14 +67,6 @@ export const solvePart1 = (input: string) => {
 const destringCoordinate = (coord: string) => {
   const [col, row] = coord.split(",").map((x) => Number(x));
   return { col, row };
-};
-
-const forEachPair = <T>(callback: (a: T, b: T) => void, list: T[]) => {
-  for (let i = 0; i < list.length - 1; i++) {
-    for (let j = i; j < list.length; j++) {
-      callback(list[i], list[j]);
-    }
-  }
 };
 
 export const solvePart2 = (input: string) => {
