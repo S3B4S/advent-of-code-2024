@@ -94,12 +94,12 @@ export class Board<K extends PropertyKey, V extends number> {
     this._encoding = encoding;
 
     for (let i = 0; i < board.length; i++) {
-      this._board[i] = encoding?.has(board[i] as K)
-        ? encoding.get(board[i] as K)!
+      this._board[i] = encoding?.hasX(board[i] as K)
+        ? encoding.getYByX(board[i] as K)!
         : 0;
 
       // @TOOD this as is not correct
-      if (encoding?.has(board[i] as K)) {
+      if (encoding?.hasX(board[i] as K)) {
         if (!this._positionsByKey[board[i] as K]) {
           this._positionsByKey[board[i] as K] = [];
         }
@@ -171,7 +171,7 @@ export class Board<K extends PropertyKey, V extends number> {
    */
   getCell(coord: Coordinate): K | undefined {
     if (!this.isWithinBounds(coord)) throw new Error("Cell is out of bounds");
-    return this._encoding?.getKey(
+    return this._encoding?.getXByY(
       this._board[coord.col + coord.row * this._width] as V
     );
   }
@@ -217,9 +217,9 @@ export class Board<K extends PropertyKey, V extends number> {
     let output = "";
     for (let i = 0; i < this._board.length; i++) {
       if (i % this._width === 0) output += "\n";
-      output += encoding?.getKey(this._board[i] as V)
+      output += encoding?.getXByY(this._board[i] as V)
         ? // @TODO
-          (encoding?.getKey(this._board[i] as V) as string)
+          (encoding?.getXByY(this._board[i] as V) as string)
         : this._board[i];
     }
     return output;

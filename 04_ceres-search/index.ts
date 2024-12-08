@@ -38,11 +38,11 @@ export const solvePart1 = (input: string) => {
         board.safeGetCell({
           col: mNeighbour.col + relativeDirection.col,
           row: mNeighbour.row + relativeDirection.row,
-        }) === encoding.get("A") &&
+        }) === encoding.getYByX("A") &&
         board.safeGetCell({
           col: mNeighbour.col + relativeDirection.col * 2,
           row: mNeighbour.row + relativeDirection.row * 2,
-        }) === encoding.get("S")
+        }) === encoding.getYByX("S")
       ) {
         count++;
       }
@@ -75,11 +75,11 @@ export const solvePart2 = (input: string) => {
     // If any of the neighbours are not an M or S, skip it
     for (const nb of crossNeighbours) {
       const el = board.safeGetCell(nb)
-      if(!(el === encoding.get('M') || el === encoding.get('S'))) return;
+      if(!(el === encoding.getYByX('M') || el === encoding.getYByX('S'))) return;
     }
 
     const [mCells, sCells] = partition((el: Coordinate) => {
-      return board.safeGetCell(el) === encoding.get("M");
+      return board.safeGetCell(el) === encoding.getYByX("M");
     }, crossNeighbours);
 
     if (!(mCells.length === 2 && sCells.length === 2)) return;

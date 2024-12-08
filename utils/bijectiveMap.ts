@@ -1,77 +1,87 @@
-// Use something else for Key-Value
-export class BijectiveMap<K = unknown, V = unknown> {
-  forward: Map<K, V>;
-  reverse: Map<V, K>;
+export class BijectiveMap<X = unknown, Y = unknown> {
+  forward: Map<X, Y>;
+  reverse: Map<Y, X>;
 
   constructor(mappings = {}) {
-    // Forward mapping (key -> value)
+    // Forward mapping (X -> Y)
     this.forward = new Map();
 
-    // Reverse mapping (value -> key)
+    // Reverse mapping (Y -> X)
     this.reverse = new Map();
 
     // Populate the map if initial mappings are provided
-    for (const [key, value] of Object.entries(mappings)) {
-      this.set(key as K, value as V);
+    for (const [x, y] of Object.entries(mappings) as [X, Y][]) {
+      this.set(x, y);
     }
   }
 
   /**
    * Add a new mapping
    */
-  set(key: K, value: V) {
+  set(x: X, y: Y) {
     // Remove any existing mappings to prevent duplicate values
-    if (this.forward.has(key)) {
-      const oldValue = this.forward.get(key)!;
-      this.reverse.delete(oldValue);
+    if (this.forward.has(x)) {
+      const oldY = this.forward.get(x)!;
+      this.reverse.delete(oldY);
     }
-    if (this.reverse.has(value)) {
-      const oldKey = this.reverse.get(value)!;
-      this.forward.delete(oldKey);
+    if (this.reverse.has(y)) {
+      const oldX = this.reverse.get(y)!;
+      this.forward.delete(oldX);
     }
 
     // Set forward and reverse mappings
-    this.forward.set(key, value);
-    this.reverse.set(value, key);
+    this.forward.set(x, y);
+    this.reverse.set(y, x);
   }
 
   /**
-   * Get value by key (encoding)
+   * Get y by x
    */
-  get(key: K) {
-    return this.forward.get(key);
+  getYByX(x: X) {
+    return this.forward.get(x);
   }
 
   /**
-   * Get key by value (decoding)
+   * Get x by y
    */
-  getKey(value: V) {
-    return this.reverse.get(value);
+  getXByY(y: Y) {
+    return this.reverse.get(y);
   }
 
   /**
-   * Delete a mapping by key
+   * Delete a mapping by x
    */
-  delete(key: K) {
-    const value = this.forward.get(key);
-    this.forward.delete(key);
+  deleteByX(x: X) {
+    const value = this.forward.get(x);
+    this.forward.delete(x);
     if (value !== undefined) {
       this.reverse.delete(value);
     }
   }
 
   /**
-   * Check if a key exists
+   * Delete a mapping by y
    */
-  has(key: K) {
-    return this.forward.has(key);
+  deleteByY(y: Y) {
+    const key = this.reverse.get(y);
+    this.reverse.delete(y);
+    if (key !== undefined) {
+      this.forward.delete(key);
+    }
   }
 
   /**
-   * Check if a value exists
+   * Check if x exists
    */
-  hasValue(value: V) {
-    return this.reverse.has(value);
+  hasX(x: X) {
+    return this.forward.has(x);
+  }
+
+  /**
+   * Check if y exists
+   */
+  hasY(y: Y) {
+    return this.reverse.has(y);
   }
 
   /**
