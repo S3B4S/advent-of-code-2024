@@ -1,7 +1,14 @@
 import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
-import { addCoordinates, Coordinate, relativeCoords } from "../utils/board.ts";
+import {
+  addCoordinates,
+  Coordinate,
+  relativeCoords,
+  stringifyCoord,
+  stringifyCoordDirection,
+} from "../utils/board.ts";
 import { Direction } from "../utils/board.ts";
 import { Board } from "../utils/board.ts";
+import { HashMap } from "../utils/hashMap.ts";
 
 const turn90Degrees = (direction: Direction): Direction => {
   return (
@@ -58,12 +65,6 @@ export const coordsBetween = (
 
   return result;
 };
-
-const stringifyCoord = (coord: Coordinate) =>
-  String(coord.col) + "," + String(coord.row);
-
-const stringifyCoordDirection = (coord: Coordinate, direction: Direction) =>
-  String(coord.col) + "," + String(coord.row) + "," + String(direction);
 
 /**
  * Might want to test
@@ -343,28 +344,6 @@ export const solvePart2 = (input: string) => {
 
   return placedObjectsHashMap.size();
 };
-
-class HashMap<T> {
-  private hashMap: Record<string, number> = {};
-
-  constructor(private hashFn: (x: T) => string) {}
-
-  add(key: T) {
-    this.hashMap[this.hashFn(key)] = 1;
-  }
-
-  has(key: T) {
-    return !!this.hashMap[this.hashFn(key)];
-  }
-
-  list() {
-    return Object.keys(this.hashMap);
-  }
-
-  size() {
-    return this.list().length;
-  }
-}
 
 const detectLoop = (pawn: Pawn, direction: Direction) => {
   // Bug: the actual inserted object is not present here so it could miss on loops

@@ -63,6 +63,17 @@ export const addCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
   };
 };
 
+export const subtractCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
+  return {
+    col: coordA.col - coordB.col,
+    row: coordA.row - coordB.row,
+  };
+};
+
+export const equalCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
+  return coordA.col === coordB.col && coordA.row === coordB.row;
+};
+
 /**
  * Indexing columns and rows start at 0, going from left to right and top to bottom.
  * When providing coordinates, column first, then the row
@@ -176,6 +187,10 @@ export class Board<K extends PropertyKey, V extends number> {
     return this._board[coord.col + coord.row * this._width];
   }
 
+  getPositionsByKey(key: K) {
+    return this._positionsByKey[key];
+  }
+
   /**
    * Abstracing away the double loop which performs looping over every cell in the board
    * @param callback - The callback function to be executed for each cell,
@@ -210,3 +225,11 @@ export class Board<K extends PropertyKey, V extends number> {
     return output;
   }
 }
+
+export const stringifyCoord = (coord: Coordinate) =>
+  String(coord.col) + "," + String(coord.row);
+
+export const stringifyCoordDirection = (
+  coord: Coordinate,
+  direction: Direction
+) => String(coord.col) + "," + String(coord.row) + "," + String(direction);
