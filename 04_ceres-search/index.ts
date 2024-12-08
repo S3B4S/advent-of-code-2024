@@ -25,8 +25,7 @@ export const solvePart1 = (input: string) => {
       .neighbours({ col, row })
       .filter(
         (neighbour) =>
-          board.getCell({ col: neighbour.col, row: neighbour.row }) ===
-          encoding.get("M")
+          board.getCell({ col: neighbour.col, row: neighbour.row }) === "M"
       );
 
     for (const mNeighbour of mNeighbours) {
