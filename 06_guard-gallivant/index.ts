@@ -1,4 +1,4 @@
-import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
+import { BijectiveMap } from "../utils/bijectiveMap.ts";
 import {
   addCoordinates,
   Coordinate,
@@ -125,7 +125,7 @@ export const solvePart1 = (input: string) => {
   const board = new Board(
     asString,
     width,
-    new BidirectionalMap<string, number>({
+    new BijectiveMap<string, number>({
       "^": 1,
       "#": 2,
     })
@@ -253,7 +253,7 @@ export const solvePart2 = (input: string) => {
 
   const asString = input.replaceAll("\n", "");
 
-  const encoding = new BidirectionalMap<string, number>({
+  const encoding = new BijectiveMap<string, number>({
     ".": 0,
     "^": 1,
     "#": 2,

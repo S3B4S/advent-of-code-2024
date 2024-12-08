@@ -1,5 +1,5 @@
 // Use something else for Key-Value
-export class BidirectionalMap<K = unknown, V = unknown> {
+export class BijectiveMap<K = unknown, V = unknown> {
   forward: Map<K, V>;
   reverse: Map<V, K>;
 

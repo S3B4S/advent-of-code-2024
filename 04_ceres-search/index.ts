@@ -1,4 +1,4 @@
-import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
+import { BijectiveMap } from "../utils/bijectiveMap.ts";
 import {
   addCoordinates,
   Board,
@@ -7,7 +7,7 @@ import {
 } from "../utils/board.ts";
 import { partition } from "ramda";
 
-const encoding = new BidirectionalMap<PropertyKey, number>({
+const encoding = new BijectiveMap<PropertyKey, number>({
   X: 1,
   M: 2,
   A: 3,

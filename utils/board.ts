@@ -1,4 +1,4 @@
-import { BidirectionalMap } from "./bidirectionalMap.ts";
+import { BijectiveMap } from "./bijectiveMap.ts";
 
 // prettier-ignore
 export enum Direction {
@@ -85,9 +85,9 @@ export class Board<K extends PropertyKey, V extends number> {
   private _board: Uint8Array;
   private _positionsByKey: Record<K, Coordinate[]>;
   private _width: number;
-  private _encoding: BidirectionalMap<K, V> | undefined;
+  private _encoding: BijectiveMap<K, V> | undefined;
 
-  constructor(board: string, width: number, encoding?: BidirectionalMap<K, V>) {
+  constructor(board: string, width: number, encoding?: BijectiveMap<K, V>) {
     this._board = new Uint8Array(board.length);
     this._positionsByKey = {} as Record<K, Coordinate[]>;
     this._width = width;
@@ -213,7 +213,7 @@ export class Board<K extends PropertyKey, V extends number> {
    * It will include newlines to separate the rows.
    * @returns the string representation of the board
    */
-  toString(encoding?: BidirectionalMap): string {
+  toString(encoding?: BijectiveMap): string {
     let output = "";
     for (let i = 0; i < this._board.length; i++) {
       if (i % this._width === 0) output += "\n";

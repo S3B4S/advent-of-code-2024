@@ -1,4 +1,4 @@
-import { BidirectionalMap } from "../utils/bidirectionalMap.ts";
+import { BijectiveMap } from "../utils/bijectiveMap.ts";
 import {
   Coordinate,
   addCoordinates,
@@ -25,7 +25,7 @@ export const solvePart1 = (input: string) => {
   const map = input.trim().replaceAll("\n", "");
 
   const allCharacters = uniqueChars(map).list();
-  const encoding = new BidirectionalMap<string, number>(
+  const encoding = new BijectiveMap<string, number>(
     Object.fromEntries(
       allCharacters.map((x, index) => [x, index]).concat([["#", 100]])
     )
@@ -74,7 +74,7 @@ export const solvePart2 = (input: string) => {
   const map = input.trim().replaceAll("\n", "");
 
   const allCharacters = uniqueChars(map).list();
-  const encoding = new BidirectionalMap<string, number>(
+  const encoding = new BijectiveMap<string, number>(
     Object.fromEntries(
       allCharacters.map((x, index) => [x, index]).concat([["#", 100]])
     )
