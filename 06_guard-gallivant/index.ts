@@ -293,7 +293,7 @@ export const solvePart2 = (input: string) => {
     ".": 0,
     "^": 1,
     "#": 2,
-    T: 10,
+    A: 10,
     ">": 11,
     v: 12,
     "<": 13,
@@ -307,42 +307,97 @@ export const solvePart2 = (input: string) => {
     hashmapObstacles[stringifyCoord(coord)] = coord;
   });
 
+  const placedObjectsHashMap = new HashMap<Coordinate>(stringifyCoord);
+
   board.iterateOver("^", (coord) => {
     let currentDirection = Direction.N;
 
     const pawn = new Pawn(board, coord);
 
-    console.log(coord);
-    console.log("coord");
-
-    console.log(board.toString(encoding));
-
-    for (let i = 0; i < 40; i++) {
-      pawn.conditionalNextStep((coord, value) => {
+    for (let i = 0; i < width * height; i++) {
+      const hasTakenStep = pawn.conditionalNextStep((peekingAtCoord, value) => {
         board.setCell(
           directionNums[currentDirection as keyof typeof directionNums],
           pawn.currentPosition
         );
-        console.log(pawn.currentPosition);
-        if (value === ".") return currentDirection;
+
+        if (value === ".") {
+          const newBoard = new Board(asString, width, encoding);
+          newBoard.setCell(2, peekingAtCoord);
+          const ghost = new Pawn(newBoard, pawn.currentPosition);
+          const hasLoop = detectLoop(ghost, turn90Degrees(currentDirection));
+
+          if (hasLoop) placedObjectsHashMap.add(peekingAtCoord);
+
+          return currentDirection;
+        }
         if (value === "#") {
           currentDirection = turn90Degrees(currentDirection);
           return currentDirection;
         }
         return currentDirection;
       }, currentDirection);
+      if (!hasTakenStep) break;
     }
-
-    console.log(board.toString(encoding));
-
-    // console.log(pawn.currentPosition);
-    // pawn.step(Direction.E);
-    // console.log(pawn.currentPosition);
-    // pawn.step(Direction.N);
-    // console.log(pawn.currentPosition);
   });
 
-  return 0;
+  return placedObjectsHashMap.size();
+};
+
+class HashMap<T> {
+  private hashMap: Record<string, number> = {};
+
+  constructor(private hashFn: (x: T) => string) {}
+
+  add(key: T) {
+    this.hashMap[this.hashFn(key)] = 1;
+  }
+
+  has(key: T) {
+    return !!this.hashMap[this.hashFn(key)];
+  }
+
+  list() {
+    return Object.keys(this.hashMap);
+  }
+
+  size() {
+    return this.list().length;
+  }
+}
+
+const detectLoop = (pawn: Pawn, direction: Direction) => {
+  // Bug: the actual inserted object is not present here so it could miss on loops
+  const visitedHashMap = new HashMap<{ coord: Coordinate; dir: Direction }>(
+    ({ coord, dir }) => stringifyCoordDirection(coord, dir)
+  );
+
+  let currentDirection = direction;
+  for (let i = 0; i < 130 * 130; i++) {
+    if (
+      visitedHashMap.has({ coord: pawn.currentPosition, dir: currentDirection })
+    ) {
+      // If we've been here before, break
+      return true;
+    }
+
+    visitedHashMap.add({ coord: pawn.currentPosition, dir: currentDirection });
+
+    const hasTakenStep = pawn.conditionalNextStep((coord, value) => {
+      if (value === ".") {
+        return currentDirection;
+      }
+      if (value === "#") {
+        currentDirection = turn90Degrees(currentDirection);
+        return currentDirection;
+      }
+      return currentDirection;
+    }, currentDirection);
+
+    if (!hasTakenStep) break;
+  }
+
+  return false;
 };
 
 /**
@@ -368,21 +423,29 @@ class Pawn {
 
   /**
    * Peek ahead and based on the value of the upcoming tile, you can change directions
-   * @param condition
+   * @param callback coord is the next position the pawn goes to
    * @param direction
    * @param n
+   * @returns true if a step was taken, false if not (due to out of bounds for example)
    */
   conditionalNextStep(
-    condition: (coord: Coordinate, value: PropertyKey) => Direction,
+    callback: (coord: Coordinate, value: PropertyKey) => Direction,
     direction: Direction,
     n: number = 1
   ) {
     const peekNextStep = this.peekStep(direction, n);
-    const nextDirection = condition(
+    if (!this._board.isWithinBounds(peekNextStep)) return false;
+    const nextDirection = callback(
       peekNextStep,
       this._board.getCell(peekNextStep)!
     );
-    this.step(nextDirection, n);
+    // Only move if we still go the same direciton.
+    // If direction has changed, first only turn around
+    if (direction === nextDirection) {
+      this.step(nextDirection, n);
+    }
+    // Turning around is also a "step"
+    return true;
   }
 
   /**

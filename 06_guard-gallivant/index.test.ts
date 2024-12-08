@@ -24,19 +24,6 @@ const exampleInput = `
 ......#...
 `.trim();
 
-const exampleInput2 = `
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-....#...#.
-#.........
-......#...
-`.trim();
-
 testWrapper("Day 06", () => {
   Deno.test("Part 1 - Example input", () => {
     expect(solvePart1(exampleInput)).toEqual(41);
@@ -59,13 +46,6 @@ testWrapper("Day 06", () => {
 ...^..
     `)).toEqual(4);
   });
-
-  Deno.test.ignore(
-    "Part 1 - Example input - Multiple objects in starting row",
-    () => {
-      expect(solvePart1(exampleInput2)).toEqual(0);
-    }
-  );
 
   Deno.test("Part 1 - Example - Coords between - row", () => {
     expect(coordsBetween({ col: 4, row: 4 }, { col: 7, row: 4 })).toStrictEqual(
@@ -111,11 +91,11 @@ testWrapper("Day 06", () => {
     expect(solvePart1(fileInput)).toEqual(5101);
   });
 
-  Deno.test.only("Part 2 - Example input", () => {
+  Deno.test("Part 2 - Example input", () => {
     expect(solvePart2(exampleInput)).toEqual(6);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(1951);
   });
 });
