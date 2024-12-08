@@ -1,21 +1,18 @@
-export class HashMap<T> {
-  private hashMap: Record<string, number> = {};
-
-  constructor(private hashFn: (x: T) => string) {}
-
-  add(key: T) {
-    this.hashMap[this.hashFn(key)] = 1;
+export class HashMap<T> extends Map<string, number> {
+  constructor(private hashFn: (x: T) => string) {
+    super();
   }
 
-  has(key: T) {
-    return !!this.hashMap[this.hashFn(key)];
+  add(key: T) {
+    this.set(this.hashFn(key), 1);
+    return this;
+  }
+
+  contains(key: T) {
+    return this.has(this.hashFn(key));
   }
 
   list() {
-    return Object.keys(this.hashMap);
-  }
-
-  size() {
-    return this.list().length;
+    return [...this.keys()];
   }
 }

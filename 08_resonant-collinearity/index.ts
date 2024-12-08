@@ -60,7 +60,7 @@ export const solvePart1 = (input: string) => {
     board.setCell(100, destringCoordinate(antiNode));
   }
   // console.log(board.toString(encoding));
-  return possibleAntiNodes.size();
+  return possibleAntiNodes.size;
 };
 
 const destringCoordinate = (coord: string) => {
@@ -113,5 +113,5 @@ export const solvePart2 = (input: string) => {
     }, board.getPositionsByKey(char));
   }
 
-  return possibleAntiNodes.size();
+  return possibleAntiNodes.size;
 };

@@ -308,7 +308,7 @@ export const solvePart2 = (input: string) => {
     }
   });
 
-  return placedObjectsHashMap.size();
+  return placedObjectsHashMap.size;
 };
 
 const detectLoop = (pawn: Pawn, direction: Direction) => {
@@ -319,9 +319,11 @@ const detectLoop = (pawn: Pawn, direction: Direction) => {
   let currentDirection = direction;
   for (let i = 0; i < 130 * 130; i++) {
     if (
-      visitedHashMap.has({ coord: pawn.currentPosition, dir: currentDirection })
+      visitedHashMap.contains({
+        coord: pawn.currentPosition,
+        dir: currentDirection,
+      })
     ) {
-      // If we've been here before, break
       return true;
     }
 
