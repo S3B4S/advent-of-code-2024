@@ -20,7 +20,6 @@ const uniqueChars = (str: string) => {
 };
 
 export const solvePart1 = (input: string) => {
-  const height = input.trim().split("\n").length;
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
 
@@ -78,7 +77,6 @@ const forEachPair = <T>(callback: (a: T, b: T) => void, list: T[]) => {
 };
 
 export const solvePart2 = (input: string) => {
-  const height = input.trim().split("\n").length;
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
 

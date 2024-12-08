@@ -233,3 +233,44 @@ export const stringifyCoordDirection = (
   coord: Coordinate,
   direction: Direction
 ) => String(coord.col) + "," + String(coord.row) + "," + String(direction);
+
+export const turn90DegreesClockWise = (direction: Direction): Direction => {
+  return (
+    {
+      [Direction.N]: Direction.E,
+      [Direction.E]: Direction.S,
+      [Direction.S]: Direction.W,
+      [Direction.W]: Direction.N,
+
+      [Direction.NE]: Direction.N,
+      [Direction.NW]: Direction.N,
+      [Direction.SE]: Direction.N,
+      [Direction.SW]: Direction.N,
+    }[direction] || Direction.N
+  );
+};
+
+export const turn90DegreesCounterClockwise = (
+  direction: Direction
+): Direction => {
+  return (
+    {
+      [Direction.N]: Direction.W,
+      [Direction.E]: Direction.N,
+      [Direction.S]: Direction.E,
+      [Direction.W]: Direction.S,
+
+      [Direction.NE]: Direction.N,
+      [Direction.NW]: Direction.N,
+      [Direction.SE]: Direction.N,
+      [Direction.SW]: Direction.N,
+    }[direction] || Direction.N
+  );
+};
+
+export const directionArrows = {
+  [Direction.N]: "⬆️",
+  [Direction.E]: "➡️",
+  [Direction.S]: "⬇️",
+  [Direction.W]: "⬅️",
+};

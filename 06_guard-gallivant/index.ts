@@ -5,48 +5,17 @@ import {
   relativeCoords,
   stringifyCoord,
   stringifyCoordDirection,
+  turn90DegreesClockWise,
 } from "../utils/board.ts";
 import { Direction } from "../utils/board.ts";
 import { Board } from "../utils/board.ts";
 import { HashMap } from "../utils/hashMap.ts";
 
-const turn90Degrees = (direction: Direction): Direction => {
-  return (
-    {
-      [Direction.N]: Direction.E,
-      [Direction.E]: Direction.S,
-      [Direction.S]: Direction.W,
-      [Direction.W]: Direction.N,
-
-      [Direction.NE]: Direction.N,
-      [Direction.NW]: Direction.N,
-      [Direction.SE]: Direction.N,
-      [Direction.SW]: Direction.N,
-    }[direction] || Direction.N
-  );
-};
-
-const turn90DegreesCounterClockwise = (direction: Direction): Direction => {
-  return (
-    {
-      [Direction.N]: Direction.W,
-      [Direction.E]: Direction.N,
-      [Direction.S]: Direction.E,
-      [Direction.W]: Direction.S,
-
-      [Direction.NE]: Direction.N,
-      [Direction.NW]: Direction.N,
-      [Direction.SE]: Direction.N,
-      [Direction.SW]: Direction.N,
-    }[direction] || Direction.N
-  );
-};
-
 export const coordsBetween = (
   coordA: Coordinate,
   coordB: Coordinate
 ): Coordinate[] => {
-  let result = [];
+  const result = [];
   if (coordA.row === coordB.row) {
     const [min, max] =
       coordA.col < coordB.col ? [coordA, coordB] : [coordB, coordA];
@@ -262,18 +231,11 @@ export const solvePart1 = (input: string) => {
       } else if (Direction.W === currentDirection) {
         currentPosition = { col: nextObject.col + 1, row: nextObject.row };
       }
-      currentDirection = turn90Degrees(currentDirection);
+      currentDirection = turn90DegreesClockWise(currentDirection);
     }
   });
 
   return Object.keys(hashMapVisited).length;
-};
-
-const directionArrows = {
-  [Direction.N]: "⬆️",
-  [Direction.E]: "➡️",
-  [Direction.S]: "⬇️",
-  [Direction.W]: "⬅️",
 };
 
 const directionNums = {
@@ -326,14 +288,17 @@ export const solvePart2 = (input: string) => {
           const newBoard = new Board(asString, width, encoding);
           newBoard.setCell(2, peekingAtCoord);
           const ghost = new Pawn(newBoard, pawn.currentPosition);
-          const hasLoop = detectLoop(ghost, turn90Degrees(currentDirection));
+          const hasLoop = detectLoop(
+            ghost,
+            turn90DegreesClockWise(currentDirection)
+          );
 
           if (hasLoop) placedObjectsHashMap.add(peekingAtCoord);
 
           return currentDirection;
         }
         if (value === "#") {
-          currentDirection = turn90Degrees(currentDirection);
+          currentDirection = turn90DegreesClockWise(currentDirection);
           return currentDirection;
         }
         return currentDirection;
@@ -362,12 +327,12 @@ const detectLoop = (pawn: Pawn, direction: Direction) => {
 
     visitedHashMap.add({ coord: pawn.currentPosition, dir: currentDirection });
 
-    const hasTakenStep = pawn.conditionalNextStep((coord, value) => {
+    const hasTakenStep = pawn.conditionalNextStep((_, value) => {
       if (value === ".") {
         return currentDirection;
       }
       if (value === "#") {
-        currentDirection = turn90Degrees(currentDirection);
+        currentDirection = turn90DegreesClockWise(currentDirection);
         return currentDirection;
       }
       return currentDirection;
