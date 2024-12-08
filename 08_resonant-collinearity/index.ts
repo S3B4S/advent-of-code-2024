@@ -20,7 +20,7 @@ const uniqueChars = (str: string) => {
 };
 
 export const solvePart1 = (input: string) => {
-  const heigh = input.trim().split("\n").length;
+  const height = input.trim().split("\n").length;
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
 
@@ -31,18 +31,12 @@ export const solvePart1 = (input: string) => {
     )
   );
 
-  // console.log(encoding);
-
   const board = new Board(map, width, encoding);
-
-  // console.log(board.getPositionsByKey("0"));
-
   const possibleAntiNodes = new HashMap<Coordinate>(stringifyCoord);
 
   for (const char of allCharacters.filter((x) => x !== ".")) {
     const antennas = board.getPositionsByKey(char);
 
-    console.log("char", char);
     forEachPair((a, b) => {
       const deltaAtoB = subtractCoordinates(b, a);
       const deltaBtoA = subtractCoordinates(a, b);
@@ -60,10 +54,6 @@ export const solvePart1 = (input: string) => {
         !antennas.find((c) => equalCoordinates(newB, c))
       )
         possibleAntiNodes.add(newB);
-      // console.log(newA);
-      // console.log(newB);
-      // board.setCell(100, newA);
-      // board.setCell(100, newB);
     }, board.getPositionsByKey(char));
   }
 
@@ -88,5 +78,42 @@ const forEachPair = <T>(callback: (a: T, b: T) => void, list: T[]) => {
 };
 
 export const solvePart2 = (input: string) => {
-  return 0;
+  const height = input.trim().split("\n").length;
+  const width = input.trim().split("\n")[0].length;
+  const map = input.trim().replaceAll("\n", "");
+
+  const allCharacters = uniqueChars(map).list();
+  const encoding = new BidirectionalMap<string, number>(
+    Object.fromEntries(
+      allCharacters.map((x, index) => [x, index]).concat([["#", 100]])
+    )
+  );
+
+  const board = new Board(map, width, encoding);
+  const possibleAntiNodes = new HashMap<Coordinate>(stringifyCoord);
+
+  for (const char of allCharacters.filter((x) => x !== ".")) {
+    forEachPair((a, b) => {
+      if (equalCoordinates(a, b)) return;
+
+      const deltaAtoB = subtractCoordinates(b, a);
+      const deltaBtoA = subtractCoordinates(a, b);
+
+      // go from a -> b
+      let currentPosition = b;
+      while (board.isWithinBounds(currentPosition)) {
+        possibleAntiNodes.add(currentPosition);
+        currentPosition = addCoordinates(currentPosition, deltaBtoA);
+      }
+
+      // go from b -> a
+      currentPosition = a;
+      while (board.isWithinBounds(currentPosition)) {
+        possibleAntiNodes.add(currentPosition);
+        currentPosition = addCoordinates(currentPosition, deltaAtoB);
+      }
+    }, board.getPositionsByKey(char));
+  }
+
+  return possibleAntiNodes.size();
 };
