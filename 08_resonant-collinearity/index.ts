@@ -49,8 +49,6 @@ export const solvePart2 = (input: string) => {
 
   for (const char of board.allPossibleCharacters().filter((x) => x !== ".")) {
     forEachPair((a, b) => {
-      if (equalCoordinates(a, b)) return;
-
       const deltaAtoB = subtractCoordinates(b, a);
       const deltaBtoA = subtractCoordinates(a, b);
 
