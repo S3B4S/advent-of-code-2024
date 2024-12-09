@@ -38,15 +38,7 @@ export const solvePart1 = (input: string) => {
     }, board.getPositionsByKey(char));
   }
 
-  for (const antiNode of possibleAntiNodes.list()) {
-    board.setCell(100, destringCoordinate(antiNode));
-  }
   return possibleAntiNodes.size;
-};
-
-const destringCoordinate = (coord: string) => {
-  const [col, row] = coord.split(",").map((x) => Number(x));
-  return { col, row };
 };
 
 export const solvePart2 = (input: string) => {
