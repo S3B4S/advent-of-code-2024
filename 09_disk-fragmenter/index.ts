@@ -1,5 +1,5 @@
 import { insertInArray, removeFromArray } from "../utils/list.ts";
-import { isEven, isOdd } from "../utils/number.ts";
+import { isOdd } from "../utils/number.ts";
 
 export const solvePart1 = (inputRaw: string) => {
   const input = inputRaw.trim();
@@ -21,7 +21,6 @@ export const solvePart1 = (inputRaw: string) => {
   let freeSpacePointer = 1;
   let toMovePointer = buffer.findLastIndex((x) => x.status === "occupied");
 
-  // console.log(buffer);
   while (freeSpacePointer < toMovePointer) {
     if (buffer[freeSpacePointer].amount < buffer[toMovePointer].amount) {
       // Free space will be entirely filled up
@@ -30,9 +29,7 @@ export const solvePart1 = (inputRaw: string) => {
 
       buffer[toMovePointer].amount -= buffer[freeSpacePointer].amount;
     } else if (buffer[freeSpacePointer].amount > buffer[toMovePointer].amount) {
-      // console.log(buffer);
       // We needd to "split" the current free space into two
-
       // First, the newly occupied space
       const newOccupiedSpace = {
         status: "occupied",
@@ -81,7 +78,6 @@ export const solvePart1 = (inputRaw: string) => {
       }
     }
   }
-  // console.log(buffer);
 
   let count = 0;
   let fullIndex = 0;
@@ -89,7 +85,6 @@ export const solvePart1 = (inputRaw: string) => {
     if (buffer[i].status !== "occupied") break;
 
     for (let j = 0; j < buffer[i].amount; j++) {
-      // console.log(fullIndex, buffer[i].id);
       count += fullIndex * buffer[i].id!;
       fullIndex += 1;
     }
@@ -98,6 +93,70 @@ export const solvePart1 = (inputRaw: string) => {
   return count;
 };
 
-export const solvePart2 = (input: string) => {
-  return 0;
+export const solvePart2 = (inputRaw: string) => {
+  const input = inputRaw.trim();
+  const buffer = [];
+
+  let id = 0;
+  for (let i = 0; i < input.length; i++) {
+    buffer.push({
+      status: isOdd(i) ? "free" : "occupied",
+      id: isOdd(i) ? undefined : id,
+      amount: Number(input[i]),
+    });
+
+    if (isOdd(i)) {
+      id++;
+    }
+  }
+
+  while (id > 0) {
+    const toMoveIndex = buffer.findIndex((x) => x.id === id);
+    const spaceNeeded = buffer[toMoveIndex].amount!;
+
+    // Find first free space
+    const freeSpaceIndex = buffer.findIndex(
+      (x) => x.status === "free" && x.amount >= spaceNeeded
+    );
+
+    if (freeSpaceIndex === -1 || freeSpaceIndex >= toMoveIndex) {
+      id--;
+      continue;
+    }
+
+    // Split space into two
+    const newFreeSpace = {
+      status: "free",
+      id: undefined,
+      amount: buffer[freeSpaceIndex].amount - spaceNeeded,
+    };
+
+    const newOccupiedSpace = {
+      status: "occupied",
+      id: id,
+      amount: spaceNeeded,
+    };
+
+    buffer[toMoveIndex].status = "free";
+    buffer[toMoveIndex].id = undefined;
+
+    removeFromArray(buffer, freeSpaceIndex);
+
+    insertInArray(buffer, freeSpaceIndex, newFreeSpace);
+    insertInArray(buffer, freeSpaceIndex, newOccupiedSpace);
+    id--;
+  }
+
+  let fullIndex = 0;
+  let count = 0;
+  for (let i = 0; i < buffer.length; i++) {
+    for (let j = 0; j < buffer[i].amount; j++) {
+      if (buffer[i].status === "occupied") {
+        count += fullIndex * buffer[i].id!;
+      }
+      fullIndex += 1;
+    }
+  }
+
+  return count;
 };
