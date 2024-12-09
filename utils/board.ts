@@ -1,3 +1,4 @@
+import { CHAR_HYPHEN_MINUS } from "https://deno.land/std@0.224.0/path/_common/constants.ts";
 import { BijectiveMap } from "./bijectiveMap.ts";
 
 // prettier-ignore
@@ -85,42 +86,45 @@ export class Board<K extends PropertyKey, V extends number> {
   private _board: Uint8Array;
   private _positionsByKey: Record<K, Coordinate[]>;
   private _width: number;
-  private _encoding: BijectiveMap<K, V> | undefined;
+  encoding: BijectiveMap<K, V> = new BijectiveMap<K, V>();
 
-  constructor(board: string, width: number, encoding?: BijectiveMap<K, V>) {
-    this._board = new Uint8Array(board.length);
+  constructor(boardAsStr: string, width: number) {
+    this._board = new Uint8Array(boardAsStr.length);
     this._positionsByKey = {} as Record<K, Coordinate[]>;
     this._width = width;
-    this._encoding = encoding;
 
-    for (let i = 0; i < board.length; i++) {
-      this._board[i] = encoding?.hasX(board[i] as K)
-        ? encoding.getYByX(board[i] as K)!
-        : 0;
-
-      // @TOOD this as is not correct
-      if (encoding?.hasX(board[i] as K)) {
-        if (!this._positionsByKey[board[i] as K]) {
-          this._positionsByKey[board[i] as K] = [];
-        }
-
-        this._positionsByKey[board[i] as K].push({
-          col: i % this._width,
-          row: Math.floor(i / this._width),
-        });
+    let currentEncodingValue = 0 as V;
+    for (let i = 0; i < boardAsStr.length; i++) {
+      const currentChar = boardAsStr[i] as K;
+      if (!this.encoding.hasX(currentChar)) {
+        this.encoding.set(currentChar, currentEncodingValue);
+        currentEncodingValue++;
       }
+
+      this._board[i] = this.encoding.getYByX(currentChar)!;
+
+      if (!this._positionsByKey[currentChar]) {
+        this._positionsByKey[currentChar] = [];
+      }
+
+      this._positionsByKey[currentChar].push({
+        col: i % this._width,
+        row: Math.floor(i / this._width),
+      });
     }
   }
 
-  // The encoded val is passed here
-  setCell(val: number, coord: Coordinate) {
-    this._board[coord.col + coord.row * this._width] = val;
+  setCell(val: K, coord: Coordinate) {
+    this._board[coord.col + coord.row * this._width] = this.encoding.getYByX(
+      val
+    )! as number;
   }
 
   /**
    * @TODO
    */
   iterateOver(key: K, callback: (coord: Coordinate) => void) {
+    console.log(this._positionsByKey[key]);
     if (!this._positionsByKey[key]) return;
     this._positionsByKey[key].forEach(({ col, row }) => {
       callback({ col, row });
@@ -171,7 +175,7 @@ export class Board<K extends PropertyKey, V extends number> {
    */
   getCell(coord: Coordinate): K | undefined {
     if (!this.isWithinBounds(coord)) throw new Error("Cell is out of bounds");
-    return this._encoding?.getXByY(
+    return this.encoding?.getXByY(
       this._board[coord.col + coord.row * this._width] as V
     );
   }
@@ -189,6 +193,10 @@ export class Board<K extends PropertyKey, V extends number> {
 
   getPositionsByKey(key: K) {
     return this._positionsByKey[key];
+  }
+
+  allPossibleCharacters() {
+    return this.encoding.listX();
   }
 
   /**
@@ -213,14 +221,11 @@ export class Board<K extends PropertyKey, V extends number> {
    * It will include newlines to separate the rows.
    * @returns the string representation of the board
    */
-  toString(encoding?: BijectiveMap): string {
+  toString(): string {
     let output = "";
     for (let i = 0; i < this._board.length; i++) {
       if (i % this._width === 0) output += "\n";
-      output += encoding?.getXByY(this._board[i] as V)
-        ? // @TODO
-          (encoding?.getXByY(this._board[i] as V) as string)
-        : this._board[i];
+      output += this.encoding?.getXByY(this._board[i] as V) as string;
     }
     return output;
   }

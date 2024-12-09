@@ -1,4 +1,3 @@
-import { BijectiveMap } from "../utils/bijectiveMap.ts";
 import {
   Coordinate,
   addCoordinates,
@@ -10,31 +9,13 @@ import {
 import { HashMap } from "../utils/hashMap.ts";
 import { forEachPair } from "../utils/list.ts";
 
-const uniqueChars = (str: string) => {
-  const chars = new HashMap<string>((c) => c);
-
-  for (let i = 0; i < str.length; i++) {
-    chars.add(str[i]);
-  }
-
-  return chars;
-};
-
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
-
-  const allCharacters = uniqueChars(map).list();
-  const encoding = new BijectiveMap<string, number>(
-    Object.fromEntries(
-      allCharacters.map((x, index) => [x, index]).concat([["#", 100]])
-    )
-  );
-
-  const board = new Board(map, width, encoding);
+  const board = new Board(map, width);
   const possibleAntiNodes = new HashMap<Coordinate>(stringifyCoord);
 
-  for (const char of allCharacters.filter((x) => x !== ".")) {
+  for (const char of board.allPossibleCharacters().filter((x) => x !== ".")) {
     const antennas = board.getPositionsByKey(char);
 
     forEachPair((a, b) => {
@@ -60,7 +41,6 @@ export const solvePart1 = (input: string) => {
   for (const antiNode of possibleAntiNodes.list()) {
     board.setCell(100, destringCoordinate(antiNode));
   }
-  // console.log(board.toString(encoding));
   return possibleAntiNodes.size;
 };
 
@@ -72,18 +52,10 @@ const destringCoordinate = (coord: string) => {
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
-
-  const allCharacters = uniqueChars(map).list();
-  const encoding = new BijectiveMap<string, number>(
-    Object.fromEntries(
-      allCharacters.map((x, index) => [x, index]).concat([["#", 100]])
-    )
-  );
-
-  const board = new Board(map, width, encoding);
+  const board = new Board(map, width);
   const possibleAntiNodes = new HashMap<Coordinate>(stringifyCoord);
 
-  for (const char of allCharacters.filter((x) => x !== ".")) {
+  for (const char of board.allPossibleCharacters().filter((x) => x !== ".")) {
     forEachPair((a, b) => {
       if (equalCoordinates(a, b)) return;
 

@@ -85,6 +85,20 @@ export class BijectiveMap<X = unknown, Y = unknown> {
   }
 
   /**
+   * List all x values
+   */
+  listX() {
+    return Array.from(this.forward.keys());
+  }
+
+  /**
+   * List all y values
+   */
+  listY() {
+    return Array.from(this.reverse.keys());
+  }
+
+  /**
    * Clear all mappings
    */
   clear() {

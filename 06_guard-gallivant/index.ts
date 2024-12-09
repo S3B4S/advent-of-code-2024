@@ -122,14 +122,7 @@ export const solvePart1 = (input: string) => {
 
   const asString = input.replaceAll("\n", "");
 
-  const board = new Board(
-    asString,
-    width,
-    new BijectiveMap<string, number>({
-      "^": 1,
-      "#": 2,
-    })
-  );
+  const board = new Board(asString, width);
 
   const hashmapColsSorted: Record<number, Coordinate[]> = {};
   const hashmapRowsSorted: Record<number, Coordinate[]> = {};
@@ -253,17 +246,17 @@ export const solvePart2 = (input: string) => {
 
   const asString = input.replaceAll("\n", "");
 
-  const encoding = new BijectiveMap<string, number>({
-    ".": 0,
-    "^": 1,
-    "#": 2,
-    A: 10,
-    ">": 11,
-    v: 12,
-    "<": 13,
-  });
+  // const encoding = new BijectiveMap<string, number>({
+  //   ".": 0,
+  //   "^": 1,
+  //   "#": 2,
+  //   A: 10,
+  //   ">": 11,
+  //   v: 12,
+  //   "<": 13,
+  // });
 
-  const board = new Board(asString, width, encoding);
+  const board = new Board(asString, width);
 
   const hashmapObstacles: Record<string, Coordinate> = {};
 
@@ -279,32 +272,31 @@ export const solvePart2 = (input: string) => {
     const pawn = new Pawn(board, coord);
 
     for (let i = 0; i < width * height; i++) {
-      const hasTakenStep = pawn.conditionalNextStep((peekingAtCoord, value) => {
-        board.setCell(
-          directionNums[currentDirection as keyof typeof directionNums],
-          pawn.currentPosition
-        );
+      const hasTakenAction = pawn.conditionalNextStep(
+        (peekingAtCoord, value) => {
+          if (value === ".") {
+            const newBoard = new Board(asString, width);
+            newBoard.setCell("#", peekingAtCoord);
+            const ghost = new Pawn(newBoard, pawn.currentPosition);
+            const hasLoop = detectLoop(
+              ghost,
+              turn90DegreesClockWise(currentDirection)
+            );
 
-        if (value === ".") {
-          const newBoard = new Board(asString, width, encoding);
-          newBoard.setCell(2, peekingAtCoord);
-          const ghost = new Pawn(newBoard, pawn.currentPosition);
-          const hasLoop = detectLoop(
-            ghost,
-            turn90DegreesClockWise(currentDirection)
-          );
+            if (hasLoop) placedObjectsHashMap.add(peekingAtCoord);
 
-          if (hasLoop) placedObjectsHashMap.add(peekingAtCoord);
-
+            return currentDirection;
+          }
+          if (value === "#") {
+            currentDirection = turn90DegreesClockWise(currentDirection);
+            return currentDirection;
+          }
           return currentDirection;
-        }
-        if (value === "#") {
-          currentDirection = turn90DegreesClockWise(currentDirection);
-          return currentDirection;
-        }
-        return currentDirection;
-      }, currentDirection);
-      if (!hasTakenStep) break;
+        },
+        currentDirection
+      );
+      // If it hasn't taken action, we're about to leave the board
+      if (!hasTakenAction) break;
     }
   });
 
