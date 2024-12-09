@@ -55,17 +55,17 @@ export const solvePart2 = (input: string) => {
       const deltaBtoA = subtractCoordinates(a, b);
 
       // go from a -> b
-      let currentPosition = b;
-      while (board.isWithinBounds(currentPosition)) {
-        possibleAntiNodes.add(currentPosition);
-        currentPosition = addCoordinates(currentPosition, deltaBtoA);
-      }
-
-      // go from b -> a
-      currentPosition = a;
+      let currentPosition = a;
       while (board.isWithinBounds(currentPosition)) {
         possibleAntiNodes.add(currentPosition);
         currentPosition = addCoordinates(currentPosition, deltaAtoB);
+      }
+
+      // go from b -> a
+      currentPosition = b;
+      while (board.isWithinBounds(currentPosition)) {
+        possibleAntiNodes.add(currentPosition);
+        currentPosition = addCoordinates(currentPosition, deltaBtoA);
       }
     }, board.getPositionsByKey(char));
   }
