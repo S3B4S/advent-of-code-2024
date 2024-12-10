@@ -20,18 +20,19 @@ export const solvePart1 = (input: string) => {
   });
 
   board.iterateOver("0", (startingFrom) => {
-    const visited = new HashMap<Coordinate>(stringifyCoord);
-    // console.log("0 coord:", startingFrom);
     const toVisitList = new Queue<{
       coord: Coordinate;
       lookingFor: number;
       path: Coordinate[];
     }>();
-    toVisitList.add({ coord: startingFrom, lookingFor: 1, path: [] });
+    toVisitList.add({
+      coord: startingFrom,
+      lookingFor: 1,
+      path: [startingFrom],
+    });
 
     while (!toVisitList.isEmpty()) {
       const { coord: visiting, lookingFor, path } = toVisitList.remove()!;
-      visited.add(visiting);
 
       for (const neighbour of board.neighbours(visiting, [
         Direction.N,
@@ -58,13 +59,63 @@ export const solvePart1 = (input: string) => {
     }
   });
 
-  // console.log(endDestinations.list());
-
   return endDestinations.size;
 };
 
 export const solvePart2 = (input: string) => {
-  return 0;
+  const width = input.trim().split("\n")[0].length;
+  const inputAsStr = input.trim().replaceAll("\n", "");
+
+  const board = new Board(inputAsStr, width);
+
+  // BFS
+  // Also backtrack to find out which nodes will lead to a successful path
+
+  const possiblePaths = new HashMap<Coordinate[]>((path) => {
+    return path.map(stringifyCoord).join("|");
+  });
+
+  board.iterateOver("0", (startingFrom) => {
+    const toVisitList = new Queue<{
+      coord: Coordinate;
+      lookingFor: number;
+      path: Coordinate[];
+    }>();
+    toVisitList.add({
+      coord: startingFrom,
+      lookingFor: 1,
+      path: [startingFrom],
+    });
+
+    while (!toVisitList.isEmpty()) {
+      const { coord: visiting, lookingFor, path } = toVisitList.remove()!;
+
+      for (const neighbour of board.neighbours(visiting, [
+        Direction.N,
+        Direction.E,
+        Direction.S,
+        Direction.W,
+      ])) {
+        if (path.find((prevCoord) => equalCoordinates(prevCoord, neighbour)))
+          continue;
+
+        if (board.getCell(neighbour) === "9" && lookingFor === 9) {
+          possiblePaths.add([...path, neighbour]);
+          continue;
+        }
+
+        if (board.getCell(neighbour) === String(lookingFor)) {
+          toVisitList.add({
+            coord: neighbour,
+            lookingFor: lookingFor + 1,
+            path: [...path, neighbour],
+          });
+        }
+      }
+    }
+  });
+
+  return possiblePaths.size;
 };
 
 class Queue<T> {
