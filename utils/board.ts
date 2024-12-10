@@ -124,7 +124,6 @@ export class Board<K extends PropertyKey, V extends number> {
    * @TODO
    */
   iterateOver(key: K, callback: (coord: Coordinate) => void) {
-    console.log(this._positionsByKey[key]);
     if (!this._positionsByKey[key]) return;
     this._positionsByKey[key].forEach(({ col, row }) => {
       callback({ col, row });
@@ -134,11 +133,28 @@ export class Board<K extends PropertyKey, V extends number> {
   /**
    * @TODO
    */
-  neighbours(currentCoords: Coordinate, distance: number = 1) {
-    const neighboursRelativeCoordinates = relativeCoordsList.map((coords) => ({
-      col: coords.col * distance,
-      row: coords.row * distance,
-    }));
+  neighbours(
+    currentCoords: Coordinate,
+    customRelativeCoords?: Direction[],
+    distance: number = 1
+  ) {
+    let neighboursRelativeCoordinates;
+
+    if (customRelativeCoords) {
+      neighboursRelativeCoordinates = (
+        Object.entries(relativeCoords) as [Direction, Coordinate][]
+      )
+        .filter(([dir]) => customRelativeCoords.includes(dir))
+        .map(([dir, coords]) => ({
+          col: coords.col * distance,
+          row: coords.row * distance,
+        }));
+    } else {
+      neighboursRelativeCoordinates = relativeCoordsList.map((coords) => ({
+        col: coords.col * distance,
+        row: coords.row * distance,
+      }));
+    }
 
     return neighboursRelativeCoordinates
       .map((coord) => ({
