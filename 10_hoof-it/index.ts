@@ -1,7 +1,7 @@
 import { Coordinate, Direction, equalCoordinates } from "../utils/board.ts";
 import { stringifyCoord } from "../utils/board.ts";
 import { Board } from "../utils/board.ts";
-import { HashMap } from "../utils/hashMap.ts";
+import { HashSet } from "../utils/hashSet.ts";
 
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
@@ -12,7 +12,7 @@ export const solvePart1 = (input: string) => {
   // BFS
   // Also backtrack to find out which nodes will lead to a successful path
 
-  const endDestinations = new HashMap<{
+  const endDestinations = new HashSet<{
     startingFrom: Coordinate;
     endingAt: Coordinate;
   }>(({ startingFrom, endingAt }) => {
@@ -44,7 +44,7 @@ export const solvePart1 = (input: string) => {
           continue;
 
         if (board.getCell(neighbour) === "9" && lookingFor === 9) {
-          endDestinations.add({ startingFrom, endingAt: neighbour });
+          endDestinations.include({ startingFrom, endingAt: neighbour });
           continue;
         }
 
@@ -71,7 +71,7 @@ export const solvePart2 = (input: string) => {
   // BFS
   // Also backtrack to find out which nodes will lead to a successful path
 
-  const possiblePaths = new HashMap<Coordinate[]>((path) => {
+  const possiblePaths = new HashSet<Coordinate[]>((path) => {
     return path.map(stringifyCoord).join("|");
   });
 
@@ -100,7 +100,7 @@ export const solvePart2 = (input: string) => {
           continue;
 
         if (board.getCell(neighbour) === "9" && lookingFor === 9) {
-          possiblePaths.add([...path, neighbour]);
+          possiblePaths.include([...path, neighbour]);
           continue;
         }
 

@@ -6,14 +6,14 @@ import {
   stringifyCoord,
   equalCoordinates,
 } from "../utils/board.ts";
-import { HashMap } from "../utils/hashMap.ts";
+import { HashSet } from "../utils/hashSet.ts";
 import { forEachPair } from "../utils/list.ts";
 
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
   const board = new Board(map, width);
-  const possibleAntiNodes = new HashMap<Coordinate>(stringifyCoord);
+  const possibleAntiNodes = new HashSet<Coordinate>(stringifyCoord);
 
   for (const char of board.allPossibleCharacters().filter((x) => x !== ".")) {
     const antennas = board.getPositionsByKey(char);
@@ -29,12 +29,12 @@ export const solvePart1 = (input: string) => {
         board.isWithinBounds(newA) &&
         !antennas.find((c) => equalCoordinates(newA, c))
       )
-        possibleAntiNodes.add(newA);
+        possibleAntiNodes.include(newA);
       if (
         board.isWithinBounds(newB) &&
         !antennas.find((c) => equalCoordinates(newB, c))
       )
-        possibleAntiNodes.add(newB);
+        possibleAntiNodes.include(newB);
     }, board.getPositionsByKey(char));
   }
 
@@ -45,7 +45,7 @@ export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const map = input.trim().replaceAll("\n", "");
   const board = new Board(map, width);
-  const possibleAntiNodes = new HashMap<Coordinate>(stringifyCoord);
+  const possibleAntiNodes = new HashSet<Coordinate>(stringifyCoord);
 
   for (const char of board.allPossibleCharacters().filter((x) => x !== ".")) {
     forEachPair((a, b) => {
@@ -55,14 +55,14 @@ export const solvePart2 = (input: string) => {
       // go from a -> b
       let currentPosition = a;
       while (board.isWithinBounds(currentPosition)) {
-        possibleAntiNodes.add(currentPosition);
+        possibleAntiNodes.include(currentPosition);
         currentPosition = addCoordinates(currentPosition, deltaAtoB);
       }
 
       // go from b -> a
       currentPosition = b;
       while (board.isWithinBounds(currentPosition)) {
-        possibleAntiNodes.add(currentPosition);
+        possibleAntiNodes.include(currentPosition);
         currentPosition = addCoordinates(currentPosition, deltaBtoA);
       }
     }, board.getPositionsByKey(char));

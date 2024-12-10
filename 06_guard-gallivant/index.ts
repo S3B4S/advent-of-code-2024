@@ -9,7 +9,7 @@ import {
 } from "../utils/board.ts";
 import { Direction } from "../utils/board.ts";
 import { Board } from "../utils/board.ts";
-import { HashMap } from "../utils/hashMap.ts";
+import { HashSet } from "../utils/hashSet.ts";
 import { Pawn } from "../utils/pawn.ts";
 
 export const coordsBetween = (
@@ -264,7 +264,7 @@ export const solvePart2 = (input: string) => {
     hashmapObstacles[stringifyCoord(coord)] = coord;
   });
 
-  const placedObjectsHashMap = new HashMap<Coordinate>(stringifyCoord);
+  const placedObjectsHashMap = new HashSet<Coordinate>(stringifyCoord);
 
   board.iterateOver("^", (coord) => {
     let currentDirection = Direction.N;
@@ -283,7 +283,7 @@ export const solvePart2 = (input: string) => {
               turn90DegreesClockWise(currentDirection)
             );
 
-            if (hasLoop) placedObjectsHashMap.add(peekingAtCoord);
+            if (hasLoop) placedObjectsHashMap.include(peekingAtCoord);
 
             return currentDirection;
           }
@@ -304,7 +304,7 @@ export const solvePart2 = (input: string) => {
 };
 
 const detectLoop = (pawn: Pawn, direction: Direction) => {
-  const visitedHashMap = new HashMap<{ coord: Coordinate; dir: Direction }>(
+  const visitedHashMap = new HashSet<{ coord: Coordinate; dir: Direction }>(
     ({ coord, dir }) => stringifyCoordDirection(coord, dir)
   );
 
@@ -319,7 +319,10 @@ const detectLoop = (pawn: Pawn, direction: Direction) => {
       return true;
     }
 
-    visitedHashMap.add({ coord: pawn.currentPosition, dir: currentDirection });
+    visitedHashMap.include({
+      coord: pawn.currentPosition,
+      dir: currentDirection,
+    });
 
     const hasTakenStep = pawn.conditionalNextStep((_, value) => {
       if (value === ".") {
