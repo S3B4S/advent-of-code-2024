@@ -1,75 +1,69 @@
 import { isEven } from "../utils/number.ts";
 
-export const solvePart1 = (input: string) => {
-  const values = input.split(" ").map(Number);
-  const root = [];
-
+export const solve = (input: string, maxAmountBlinks: number = 25) => {
   let count = 0;
-  for (const value of values) {
-    const node = new BinaryTreeNode(value);
-    count += blink(node, 25);
-    root.push(node);
-  }
+
+  input.split(" ").forEach((stoneLabel) => {
+    const value = Number(stoneLabel);
+    count += blink(value, maxAmountBlinks);
+  });
 
   return count;
 };
 
-export const solvePart2 = (input: string) => {
-  return 0;
-};
+const mem: Record<string, number> = {};
 
 /**
  * Return amount of leaves in the tree
- * @param node
+ * @param value
  * @param maxAmountBlinks
  * @param previousAmountBlinks
  * @returns
  */
 const blink = (
-  node: BinaryTreeNode,
+  value: number,
   maxAmountBlinks: number,
   previousAmountBlinks: number = 0
 ): number => {
+  const memKey = `${value}-${maxAmountBlinks - previousAmountBlinks}`;
+  if (mem[memKey]) {
+    return mem[memKey];
+  }
+
   if (previousAmountBlinks === maxAmountBlinks) {
     return 1;
   }
 
-  if (node.value === 0) {
-    node.left = new BinaryTreeNode(1);
-    node.right = null;
-    return blink(node.left, maxAmountBlinks, previousAmountBlinks + 1);
+  if (value === 0) {
+    const res = blink(1, maxAmountBlinks, previousAmountBlinks + 1);
+    mem[memKey] = res;
+    return res;
   }
 
-  const digitAsString = String(node.value);
+  const digitAsString = String(value);
   if (isEven(digitAsString.length)) {
     const halfway = digitAsString.length / 2;
     const [leftStr, rightStr] = [
       digitAsString.slice(0, halfway),
       digitAsString.slice(halfway),
     ];
-    node.left = new BinaryTreeNode(Number(leftStr));
-    node.right = new BinaryTreeNode(Number(rightStr));
-    return (
-      blink(node.left, maxAmountBlinks, previousAmountBlinks + 1) +
-      blink(node.right, maxAmountBlinks, previousAmountBlinks + 1)
+
+    const resLeft = blink(
+      Number(leftStr),
+      maxAmountBlinks,
+      previousAmountBlinks + 1
     );
+    const resRight = blink(
+      Number(rightStr),
+      maxAmountBlinks,
+      previousAmountBlinks + 1
+    );
+
+    mem[memKey] = resLeft + resRight;
+    return resLeft + resRight;
   }
 
-  node.left = new BinaryTreeNode(node.value * 2024);
-
-  return blink(node.left, maxAmountBlinks, previousAmountBlinks + 1);
+  const res = blink(value * 2024, maxAmountBlinks, previousAmountBlinks + 1);
+  mem[memKey] = res;
+  return res;
 };
-
-class BinaryTreeNode {
-  value: number;
-  left: BinaryTreeNode | null;
-  right: BinaryTreeNode | null;
-  parent: BinaryTreeNode | null;
-
-  constructor(value: number, parent: BinaryTreeNode | null = null) {
-    this.value = value;
-    this.left = null;
-    this.right = null;
-    this.parent = parent;
-  }
-}
