@@ -15,13 +15,15 @@ A collection of coding puzzles and challenges implemented in TypeScript using De
 
 ### Prerequisites
 
-- [Deno](https://deno.land/) v2.x
+- [Deno](https://deno.land/) v2.x installed
 
 ### Installation
 
 1. Clone the repository
 
 ### Creating a New Puzzle
+
+You will need an Advent of Code session cookie for fetching puzzle inputs, set to the `AOC_SESSION_COOKIE` environment variable (or use an `.env` file).
 
 Use the scaffold command to create a new challenge directory with all necessary files:
 
