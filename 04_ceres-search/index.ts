@@ -17,7 +17,7 @@ const encoding = new BijectiveMap<PropertyKey, number>({
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const asString = input.trim().replaceAll("\n", "");
-  const board = new Board(asString, width, encoding);
+  const board = new Board(asString, width);
 
   let count = 0;
   board.iterateOver("X", ({ col, row }) => {
@@ -38,11 +38,11 @@ export const solvePart1 = (input: string) => {
         board.safeGetCell({
           col: mNeighbour.col + relativeDirection.col,
           row: mNeighbour.row + relativeDirection.row,
-        }) === encoding.getYByX("A") &&
+        }) === "A" &&
         board.safeGetCell({
           col: mNeighbour.col + relativeDirection.col * 2,
           row: mNeighbour.row + relativeDirection.row * 2,
-        }) === encoding.getYByX("S")
+        }) === "S"
       ) {
         count++;
       }
@@ -62,7 +62,7 @@ const crossDirections = [
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
   const asString = input.trim().replaceAll("\n", "");
-  const board = new Board(asString, width, encoding);
+  const board = new Board(asString, width);
 
   let count = 0;
 
@@ -75,11 +75,11 @@ export const solvePart2 = (input: string) => {
     // If any of the neighbours are not an M or S, skip it
     for (const nb of crossNeighbours) {
       const el = board.safeGetCell(nb)
-      if(!(el === encoding.getYByX('M') || el === encoding.getYByX('S'))) return;
+      if(!(el === 'M' || el === 'S')) return;
     }
 
     const [mCells, sCells] = partition((el: Coordinate) => {
-      return board.safeGetCell(el) === encoding.getYByX("M");
+      return board.safeGetCell(el) === "M";
     }, crossNeighbours);
 
     if (!(mCells.length === 2 && sCells.length === 2)) return;

@@ -266,24 +266,26 @@ export const solvePart2 = (input: string) => {
 
   const placedObjectsHashMap = new HashSet<Coordinate>(stringifyCoord);
 
-  board.iterateOver("^", (coord) => {
+  board.iterateOver("^", (startingCoord) => {
+    board.setCell(".", startingCoord);
     let currentDirection = Direction.N;
 
-    const pawn = new Pawn(board, coord);
+    const pawn = new Pawn(board, startingCoord);
 
     for (let i = 0; i < width * height; i++) {
       const hasTakenAction = pawn.conditionalNextStep(
-        (peekingAtCoord, value) => {
+        (predictedStep, value) => {
           if (value === ".") {
             const newBoard = new Board(asString, width);
-            newBoard.setCell("#", peekingAtCoord);
+            newBoard.setCell("#", predictedStep);
+            newBoard.setCell(".", startingCoord);
             const ghost = new Pawn(newBoard, pawn.currentPosition);
             const hasLoop = detectLoop(
               ghost,
               turn90DegreesClockWise(currentDirection)
             );
 
-            if (hasLoop) placedObjectsHashMap.include(peekingAtCoord);
+            if (hasLoop) placedObjectsHashMap.include(predictedStep);
 
             return currentDirection;
           }
@@ -304,14 +306,14 @@ export const solvePart2 = (input: string) => {
 };
 
 const detectLoop = (pawn: Pawn, direction: Direction) => {
-  const visitedHashMap = new HashSet<{ coord: Coordinate; dir: Direction }>(
+  const visited = new HashSet<{ coord: Coordinate; dir: Direction }>(
     ({ coord, dir }) => stringifyCoordDirection(coord, dir)
   );
 
   let currentDirection = direction;
   for (let i = 0; i < 130 * 130; i++) {
     if (
-      visitedHashMap.contains({
+      visited.contains({
         coord: pawn.currentPosition,
         dir: currentDirection,
       })
@@ -319,7 +321,7 @@ const detectLoop = (pawn: Pawn, direction: Direction) => {
       return true;
     }
 
-    visitedHashMap.include({
+    visited.include({
       coord: pawn.currentPosition,
       dir: currentDirection,
     });

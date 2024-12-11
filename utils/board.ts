@@ -86,6 +86,7 @@ export class Board<K extends PropertyKey, V extends number> {
   private _board: Uint8Array;
   private _positionsByKey: Record<K, Coordinate[]>;
   private _width: number;
+  // X will be the readable characters, Y will be the encoded values (numbers)
   encoding: BijectiveMap<K, V> = new BijectiveMap<K, V>();
 
   constructor(boardAsStr: string, width: number) {
@@ -101,7 +102,7 @@ export class Board<K extends PropertyKey, V extends number> {
         currentEncodingValue++;
       }
 
-      this._board[i] = this.encoding.getYByX(currentChar)!;
+      this._board[i] = this.encoding.getY(currentChar)!;
 
       if (!this._positionsByKey[currentChar]) {
         this._positionsByKey[currentChar] = [];
@@ -114,10 +115,36 @@ export class Board<K extends PropertyKey, V extends number> {
     }
   }
 
+  /**
+   * @TODO Doesn't update the positions by key
+   */
   setCell(val: K, coord: Coordinate) {
-    this._board[coord.col + coord.row * this._width] = this.encoding.getYByX(
-      val
-    )! as number;
+    if (!this.isWithinBounds(coord)) return false;
+
+    if (!this.encoding.hasX(val)) {
+      this.encoding.set(val, this.encoding.size as V);
+    }
+
+    if (!this._positionsByKey[val]) {
+      this._positionsByKey[val] = [];
+    }
+
+    const arrayIndex = coord.col + coord.row * this._width;
+
+    // Remove the old value from the positions by key
+    const oldVal = this.encoding.getX(this._board[arrayIndex] as V)!;
+    const positionIndex = this._positionsByKey[oldVal].findIndex((c) =>
+      equalCoordinates(c, coord)
+    );
+    this._positionsByKey[oldVal].splice(positionIndex, 1);
+
+    // Add the new value to the positions by key
+    this._positionsByKey[val].push(coord);
+
+    // Set the new value in the board
+    this._board[arrayIndex] = this.encoding.getY(val)! as number;
+
+    return true;
   }
 
   /**
@@ -191,7 +218,7 @@ export class Board<K extends PropertyKey, V extends number> {
    */
   getCell(coord: Coordinate): K | undefined {
     if (!this.isWithinBounds(coord)) throw new Error("Cell is out of bounds");
-    return this.encoding?.getXByY(
+    return this.encoding?.getX(
       this._board[coord.col + coord.row * this._width] as V
     );
   }
@@ -202,9 +229,11 @@ export class Board<K extends PropertyKey, V extends number> {
    * @param row - The row of the cell to get
    * @returns the value of the cell, if outside of bounds, return undefined.
    */
-  safeGetCell(coord: Coordinate): number | undefined {
+  safeGetCell(coord: Coordinate): K | undefined {
     if (!this.isWithinBounds(coord)) return undefined;
-    return this._board[coord.col + coord.row * this._width];
+    return this.encoding.getX(
+      this._board[coord.col + coord.row * this._width] as V
+    );
   }
 
   getPositionsByKey(key: K) {
@@ -212,7 +241,9 @@ export class Board<K extends PropertyKey, V extends number> {
   }
 
   allPossibleCharacters() {
-    return this.encoding.listX();
+    return (Object.entries(this._positionsByKey) as [K, Coordinate[]][])
+      .filter(([key, value]) => value.length > 0)
+      .map(([key]) => key);
   }
 
   /**
@@ -224,8 +255,8 @@ export class Board<K extends PropertyKey, V extends number> {
   iterateOverCells(
     callback: (value: K | undefined, coord: Coordinate) => void
   ): void {
-    for (let col = 0; col < this._width; col++) {
-      for (let row = 0; row < this._width; row++) {
+    for (let row = 0; row < this._width; row++) {
+      for (let col = 0; col < this._width; col++) {
         const currCoord = { col, row };
         callback(this.getCell(currCoord), currCoord);
       }
@@ -241,7 +272,7 @@ export class Board<K extends PropertyKey, V extends number> {
     let output = "";
     for (let i = 0; i < this._board.length; i++) {
       if (i % this._width === 0) output += "\n";
-      output += this.encoding?.getXByY(this._board[i] as V) as string;
+      output += this.encoding?.getX(this._board[i] as V) as string;
     }
     return output;
   }
@@ -259,14 +290,13 @@ export const turn90DegreesClockWise = (direction: Direction): Direction => {
   return (
     {
       [Direction.N]: Direction.E,
+      [Direction.NE]: Direction.NW,
       [Direction.E]: Direction.S,
+      [Direction.NW]: Direction.SE,
       [Direction.S]: Direction.W,
+      [Direction.SE]: Direction.SW,
       [Direction.W]: Direction.N,
-
-      [Direction.NE]: Direction.N,
-      [Direction.NW]: Direction.N,
-      [Direction.SE]: Direction.N,
-      [Direction.SW]: Direction.N,
+      [Direction.SW]: Direction.NE,
     }[direction] || Direction.N
   );
 };
@@ -277,14 +307,13 @@ export const turn90DegreesCounterClockwise = (
   return (
     {
       [Direction.N]: Direction.W,
-      [Direction.E]: Direction.N,
-      [Direction.S]: Direction.E,
+      [Direction.NW]: Direction.SW,
       [Direction.W]: Direction.S,
-
-      [Direction.NE]: Direction.N,
-      [Direction.NW]: Direction.N,
-      [Direction.SE]: Direction.N,
-      [Direction.SW]: Direction.N,
+      [Direction.SW]: Direction.SE,
+      [Direction.S]: Direction.E,
+      [Direction.SE]: Direction.NE,
+      [Direction.E]: Direction.N,
+      [Direction.NE]: Direction.NW,
     }[direction] || Direction.N
   );
 };

@@ -37,14 +37,14 @@ export class BijectiveMap<X = unknown, Y = unknown> {
   /**
    * Get y by x
    */
-  getYByX(x: X) {
+  getY(x: X) {
     return this.forward.get(x);
   }
 
   /**
    * Get x by y
    */
-  getXByY(y: Y) {
+  getX(y: Y) {
     return this.reverse.get(y);
   }
 

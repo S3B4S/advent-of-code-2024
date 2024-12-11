@@ -39,18 +39,19 @@ export class Pawn {
     direction: Direction,
     n: number = 1
   ) {
-    const peekNextStep = this.peekStep(direction, n);
+    const peekNextStep = this.predictPosition(direction, n);
     if (!this._board.isWithinBounds(peekNextStep)) return false;
     const nextDirection = callback(
       peekNextStep,
       this._board.getCell(peekNextStep)!
     );
     // Only move if we still go the same direciton.
-    // If direction has changed, first only turn around
     if (direction === nextDirection) {
       this.step(nextDirection, n);
     }
-    // Turning around is also a "step"
+    // If direction has changed, then turn to the new direction first
+
+    // Turning is also a "step"
     return true;
   }
 
@@ -59,7 +60,7 @@ export class Pawn {
    * @param direction
    * @param n
    */
-  peekStep(direction: Direction, n: number = 1) {
+  predictPosition(direction: Direction, n: number = 1) {
     let result = this.currentPosition;
     for (let i = 0; i < n; i++) {
       result = addCoordinates(result, relativeCoords[direction]);
