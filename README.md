@@ -61,6 +61,7 @@ This will:
 ## Testing
 
 Keep in mind that addiitonally you need to grant permissions when using Deno (`-A` to grant all permissions), `--watch` is also very useful when solving a puzzle.
+
 Run all tests:
 
 ```bash
