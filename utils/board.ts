@@ -87,13 +87,15 @@ export class Board<K extends PropertyKey, V extends number> {
   // @TODO replace by HashSet
   private _positionsByKey: Record<K, Coordinate[]>;
   private _width: number;
+  private _height: number;
   // X will be the readable characters, Y will be the encoded values (numbers)
   encoding: BijectiveMap<K, V> = new BijectiveMap<K, V>();
 
-  constructor(boardAsStr: string, width: number) {
+  constructor(boardAsStr: string, width: number, height: number) {
     this._board = new Uint8Array(boardAsStr.length);
     this._positionsByKey = {} as Record<K, Coordinate[]>;
     this._width = width;
+    this._height = height;
 
     let currentEncodingValue = 0 as V;
     for (let i = 0; i < boardAsStr.length; i++) {
@@ -206,7 +208,7 @@ export class Board<K extends PropertyKey, V extends number> {
       coord.col >= 0 &&
       coord.col < this._width &&
       coord.row >= 0 &&
-      coord.row < this._width
+      coord.row < this._height
     );
   }
 
@@ -253,13 +255,11 @@ export class Board<K extends PropertyKey, V extends number> {
    *      receiving the value of the cell, and its column and row as arguments
    * @TODO shouldn't be undefined
    */
-  iterateOverCells(
-    callback: (value: K | undefined, coord: Coordinate) => void
-  ): void {
+  iterateOverCells(callback: (value: string, coord: Coordinate) => void): void {
     for (let row = 0; row < this._width; row++) {
       for (let col = 0; col < this._width; col++) {
         const currCoord = { col, row };
-        callback(this.getCell(currCoord), currCoord);
+        callback(this.getCell(currCoord) as string, currCoord);
       }
     }
   }
@@ -281,6 +281,11 @@ export class Board<K extends PropertyKey, V extends number> {
 
 export const stringifyCoord = (coord: Coordinate) =>
   String(coord.col) + "," + String(coord.row);
+
+export const destringifyCoord = (coord: string) => {
+  const [col, row] = coord.split(",");
+  return { col: Number(col), row: Number(row) };
+};
 
 export const stringifyCoordDirection = (
   coord: Coordinate,

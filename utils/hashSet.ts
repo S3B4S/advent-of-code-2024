@@ -29,6 +29,13 @@ export class HashSet<T> extends Set<string> {
   }
 
   /**
+   * @deprecated Please use `contains` instead
+   */
+  override has(value: string): boolean {
+    return super.has(value);
+  }
+
+  /**
    * Check if the hash set contains a value
    * @param value
    * @returns

@@ -42,3 +42,27 @@ export const removeFromArray = (array: any[], index: number) => {
 export const insertInArray = (array: any[], index: number, item: any) => {
   array.splice(index, 0, item);
 };
+
+/**
+ * Detects amount of gaps in a list of numbers
+ * @param list Sorted list of numbers, 0 and positive only
+ * @returns
+ */
+export const detectAmountOfGaps = (list: number[]) => {
+  if (list.length <= 1) return 0;
+  if (list[list.length - 1] - list[0] === list.length - 1) return 0;
+
+  // There must be gaps, so we try to find the amount of gaps
+  let prev = list[0];
+  let gaps = 0;
+
+  for (let i = 1; i < list.length; i++) {
+    if (prev + 1 !== list[i]) {
+      gaps++;
+    }
+
+    prev = list[i];
+  }
+
+  return gaps;
+};
