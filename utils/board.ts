@@ -84,6 +84,7 @@ export const equalCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
  */
 export class Board<K extends PropertyKey, V extends number> {
   private _board: Uint8Array;
+  // @TODO replace by HashSet
   private _positionsByKey: Record<K, Coordinate[]>;
   private _width: number;
   // X will be the readable characters, Y will be the encoded values (numbers)

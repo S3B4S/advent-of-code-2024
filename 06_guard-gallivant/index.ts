@@ -258,12 +258,6 @@ export const solvePart2 = (input: string) => {
 
   const board = new Board(asString, width);
 
-  const hashmapObstacles: Record<string, Coordinate> = {};
-
-  board.iterateOver("#", (coord) => {
-    hashmapObstacles[stringifyCoord(coord)] = coord;
-  });
-
   const placedObjectsHashMap = new HashSet<Coordinate>(stringifyCoord);
 
   board.iterateOver("^", (startingCoord) => {

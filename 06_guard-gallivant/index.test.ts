@@ -95,6 +95,21 @@ testWrapper("Day 06", () => {
     expect(solvePart2(exampleInput)).toEqual(6);
   });
 
+  Deno.test.only(
+    "Part 2 - Get into loop that's not part of original path",
+    () => {
+      expect(
+        solvePart2(`
+...#...........
+.......#.......
+..........#....
+......#........
+...^.....#.....
+    `)
+      ).toEqual(2);
+    }
+  );
+
   Deno.test.only("Part 2 - File input", () => {
     expect(solvePart2(fileInput)).toEqual(1951);
   });
