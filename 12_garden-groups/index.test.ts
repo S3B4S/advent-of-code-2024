@@ -33,24 +33,7 @@ MIIISIJEEE
 MMMISSJEEE
 `.trim();
 
-const exampleInput3 = `
-OOOOO
-OXOXO
-OOOOO
-OXOXO
-OOOOO
-`.trim();
 const isolateBug = `
-...CC.
-...CCC
-..CC..
-CCC...
-.C....
-.CC...
-..C...
-`.trim();
-
-const isolateBug2 = `
 ........FF
 .........F
 .......FFF
@@ -61,6 +44,14 @@ const isolateBug2 = `
 ..........
 ..........
 ..........
+`.trim();
+
+const exampleInput3 = `
+OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO
 `.trim();
 
 testWrapper("Day 12", () => {
@@ -76,14 +67,6 @@ testWrapper("Day 12", () => {
     expect(solvePart1(exampleInput3)).toEqual(772);
   });
 
-  // Deno.test.only("Part 1 - Isolate bug", () => {
-  //   expect(solvePart1(isolateBug)).toEqual(100);
-  // });
-
-  // Deno.test("Part 1 - Isolate bug 2", () => {
-  //   expect(solvePart1(isolateBug2)).toEqual(100);
-  // });
-
   Deno.test("Part 1 - File input", () => {
     expect(solvePart1(fileInput)).toEqual(1363682);
   });
@@ -93,20 +76,18 @@ testWrapper("Day 12", () => {
   });
 
   Deno.test("Part 2 - Example input 2", () => {
-    expect(
-      solvePart2(
-        `
-OOOOO
-OXOXO
-OOOOO
-OXOXO
-OOOOO
-`.trim()
-      )
-    ).toEqual(436);
+    expect(solvePart2(exampleInput2)).toEqual(1206);
   });
 
   Deno.test("Part 2 - Example input 3", () => {
+    expect(solvePart2(exampleInput3)).toEqual(436);
+  });
+
+  // Deno.test.only("Part 2 - Isolate bug", () => {
+  //   expect(solvePart2(isolateBug)).toEqual(12);
+  // });
+
+  Deno.test("Part 2 - Example input 4", () => {
     expect(
       solvePart2(
         `
@@ -120,23 +101,34 @@ EEEEE
     ).toEqual(236);
   });
 
-  // 4499 too low
-  // 192569 too low
-  // 789056 too high
-  Deno.test("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - Example input 5", () => {
+    expect(
+      solvePart2(
+        `
+AAAAAA
+AAABBA
+AAABBA
+ABBAAA
+ABBAAA
+AAAAAA
+`.trim()
+      )
+    ).toEqual(368);
   });
 
-  // Region perimeter scan tests
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(787680);
+  });
+
   Deno.test("Region perimeter scan - Example input", () => {
     const region = new HashSet<Coordinate>(stringifyCoord);
 
-    // X
-    // X X
-    // X X
-    // XXX X
-    // XXX X
-    // XXX X
+    // X....
+    // X.X..
+    // X.X..
+    // XXX.X
+    // XXX.X
+    // XXX.X
     // XXXXX
 
     [
