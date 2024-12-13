@@ -61,7 +61,6 @@ export const solvePart1 = (input: string) => {
     }
   });
 
-  // console.log(mem);
   return outcome;
 };
 
