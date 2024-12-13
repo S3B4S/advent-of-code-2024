@@ -1,3 +1,9 @@
+import {
+  Coordinate,
+  equalCoordinates,
+  stringifyCoord,
+} from "../utils/board.ts";
+
 const Regex = {
   A: /Button A: X\+(\d+), Y\+(\d+)/,
   B: /Button B: X\+(\d+), Y\+(\d+)/,
@@ -54,83 +60,134 @@ export const solvePart1 = (input: string) => {
     });
 
   let outcome = 0;
+  // console.log(machines);
   machines.forEach((machine) => {
-    const res = solveRecPart1(machine, 0, 0, 0);
-    if (Number.isFinite(res)) {
-      outcome += res;
+    mem = {};
+    set(mem, [0, 0], {
+      col: 0,
+      row: 0,
+    });
+    viableLocations = [];
+
+    solveRecPart1(
+      machine,
+      {
+        col: machine.prize.x,
+        row: machine.prize.y,
+      },
+      0,
+      0
+    );
+
+    const x = viableLocations.sort((a, b) => a.cost - b.cost)[0];
+    // console.log(viableLocations);
+    if (x) {
+      outcome += x.cost;
     }
   });
 
   return outcome;
 };
 
-const mem = {} as Record<string, number>;
-const stringifyMachine = (machine: Machine) => {
-  return `ax:${machine.a.x}, ay:${machine.a.y}|bx:${machine.b.x}, by:${machine.b.y}|px:${machine.prize.x}, py:${machine.prize.y}`;
+const set = (
+  obj: Record<string, any>,
+  path: (string | number)[],
+  value: any
+) => {
+  const [key, ...rest] = path;
+  obj[key] = obj[key] || {};
+  if (rest.length > 0) {
+    set(obj[key], rest, value);
+  } else {
+    obj[key] = value;
+  }
 };
+
+let mem = {} as Record<string, Record<string, Coordinate>>;
+
+let viableLocations = [] as { coord: Coordinate; cost: number }[];
 
 const solveRecPart1 = (
   machine: Machine,
-  totalSpent: number,
-  buttonPressesA: number,
-  buttonPressesB: number
-): number => {
-  if (buttonPressesA > 100 || buttonPressesB > 100) {
+  goal: Coordinate,
+  amountOfPressesA: number,
+  amountOfPressesB: number
+) => {
+  if (amountOfPressesA > 100 || amountOfPressesB > 100) {
     return Infinity;
   }
 
-  const cached = mem[stringifyMachine(machine)];
-  if (cached) {
-    return cached;
+  const current = mem[amountOfPressesA][amountOfPressesB];
+
+  // console.log();
+  // console.log("current: ", amountOfPressesA, amountOfPressesB);
+  // printTable(mem);
+
+  if (current.col > goal.col || current.row > goal.row) return;
+
+  if (equalCoordinates(current, goal)) {
+    viableLocations.push({
+      coord: current,
+      cost: amountOfPressesA * Tokens.A + amountOfPressesB * Tokens.B,
+    });
   }
 
-  if (machine.prize.x === 0 && machine.prize.y === 0) {
-    return totalSpent;
+  if (!mem[amountOfPressesA + 1]?.[amountOfPressesB]) {
+    // We press button A:
+    set(mem, [amountOfPressesA + 1, amountOfPressesB], {
+      col: current.col + machine.a.x,
+      row: current.row + machine.a.y,
+    });
+
+    solveRecPart1(machine, goal, amountOfPressesA + 1, amountOfPressesB);
   }
-
-  if (machine.prize.x < 0 || machine.prize.y < 0) {
-    return Infinity;
-  }
-
-  const copyA = {
-    a: { ...machine.a },
-    b: { ...machine.b },
-    prize: { ...machine.prize },
-  };
-
-  const copyB = {
-    a: { ...machine.a },
-    b: { ...machine.b },
-    prize: { ...machine.prize },
-  };
-
-  // We press button A:
-  copyA.prize.x -= copyA.a.x;
-  copyA.prize.y -= copyA.a.y;
-  const costA = solveRecPart1(
-    copyA,
-    totalSpent + Tokens.A,
-    buttonPressesA + 1,
-    buttonPressesB
-  );
-
-  mem[stringifyMachine(copyA)] = costA;
 
   // We press button B:
-  copyB.prize.x -= copyB.b.x;
-  copyB.prize.y -= copyB.b.y;
-  const costB = solveRecPart1(
-    copyB,
-    totalSpent + Tokens.B,
-    buttonPressesA,
-    buttonPressesB + 1
-  );
+  if (!mem[amountOfPressesA]?.[amountOfPressesB + 1]) {
+    set(mem, [amountOfPressesA, amountOfPressesB + 1], {
+      col: current.col + machine.b.x,
+      row: current.row + machine.b.y,
+    });
 
-  mem[stringifyMachine(copyB)] = costB;
-
-  return Math.min(costA, costB);
+    solveRecPart1(machine, goal, amountOfPressesA, amountOfPressesB + 1);
+  }
 };
 
 export const solvePart2 = (input: string) => {
   return 0;
+};
+
+const printTable = (
+  table: Record<number | string, Record<number | string, Coordinate>>
+) => {
+  // Find min/max indices
+  let minRow = Infinity;
+  let maxRow = -Infinity;
+  let minCol = Infinity;
+  let maxCol = -Infinity;
+
+  Object.keys(table).forEach((row) => {
+    const rowNum = Number(row);
+    minRow = Math.min(minRow, rowNum);
+    maxRow = Math.max(maxRow, rowNum);
+
+    Object.keys(table[row]).forEach((col) => {
+      const colNum = Number(col);
+      minCol = Math.min(minCol, colNum);
+      maxCol = Math.max(maxCol, colNum);
+    });
+  });
+
+  // Print table
+  for (let row = minRow; row <= maxRow; row++) {
+    let line = "";
+    for (let col = minCol; col <= maxCol; col++) {
+      if (table[row]?.[col]) {
+        line += ("|" + stringifyCoord(table[row][col]) + " ").padEnd(15, " ");
+      } else {
+        line += "|.".padEnd(15, " ");
+      }
+    }
+    console.log(line);
+  }
 };
