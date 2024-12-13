@@ -30,7 +30,7 @@ type Machine = {
   };
 };
 
-export const solvePart1 = (input: string) => {
+export const solve = (input: string, isPart2: boolean = false) => {
   const machines = input
     .trim()
     .split("\n\n")
@@ -53,55 +53,73 @@ export const solvePart1 = (input: string) => {
           y: Number(bY),
         },
         prize: {
-          x: Number(prizeX),
-          y: Number(prizeY),
+          x: Number(prizeX) + (isPart2 ? 10000000000000 : 0),
+          y: Number(prizeY) + (isPart2 ? 10000000000000 : 0),
         },
       };
     });
 
   let outcome = 0;
-  // console.log(machines);
-  machines.forEach((machine) => {
-    mem = {};
-    set(mem, [0, 0], {
-      col: 0,
-      row: 0,
-    });
-    viableLocations = [];
 
-    solveRecPart1(machine, {
+  // To solve with linear algebra
+  machines.forEach((machine) => {
+    const cost = solveWithLA(machine, {
       col: machine.prize.x,
       row: machine.prize.y,
     });
 
-    const x = viableLocations.sort((a, b) => a.cost - b.cost)[0];
-    if (x) {
-      outcome += x.cost;
+    if (cost) {
+      outcome += cost;
     }
   });
+
+  // To solve with dynamic programming
+  // Does not solve part 2, it's too expensive
+  // Use the linear algebra solution instead
+  // machines.forEach((machine) => {
+  //   mem = {};
+  //   set(mem, [0, 0], {
+  //     col: 0,
+  //     row: 0,
+  //   });
+  //   viableLocations = [];
+
+  //   solveWithDP(machine, {
+  //     col: machine.prize.x,
+  //     row: machine.prize.y,
+  //   });
+
+  //   const x = viableLocations.sort((a, b) => a.cost - b.cost)[0];
+
+  //   if (x) {
+  //     outcome += x.cost;
+  //   }
+  // });
 
   return outcome;
 };
 
-const set = (
-  obj: Record<string, any>,
-  path: (string | number)[],
-  value: any
-) => {
-  const [key, ...rest] = path;
-  obj[key] = obj[key] || {};
-  if (rest.length > 0) {
-    set(obj[key], rest, value);
-  } else {
-    obj[key] = value;
+const solveWithLA = (machine: Machine, goal: Coordinate) => {
+  const a = machine.prize.y;
+  const b = machine.a.y;
+  const c = machine.b.y;
+  const e = machine.prize.x;
+  const f = machine.a.x;
+  const g = machine.b.x;
+
+  const x = (c * e - g * a) / (-g * b + c * f);
+  const y = (a - b * x) / c;
+
+  if (Number.isInteger(x) && Number.isInteger(y)) {
+    return x * Tokens.A + y * Tokens.B;
   }
+  return undefined;
 };
 
 let mem = {} as Record<string, Record<string, Coordinate>>;
-
 let viableLocations = [] as { coord: Coordinate; cost: number }[];
 
-const solveRecPart1 = (machine: Machine, goal: Coordinate) => {
+const solveWithDP = (machine: Machine, goal: Coordinate) => {
   for (let b = 0; b < 100; b++) {
     for (let a = 0; a < 100; a++) {
       const current = mem[a][b];
@@ -135,41 +153,16 @@ const solveRecPart1 = (machine: Machine, goal: Coordinate) => {
   }
 };
 
-export const solvePart2 = (input: string) => {
-  return 0;
-};
-
-const printTable = (
-  table: Record<number | string, Record<number | string, Coordinate>>
+const set = (
+  obj: Record<string, any>,
+  path: (string | number)[],
+  value: any
 ) => {
-  // Find min/max indices
-  let minRow = Infinity;
-  let maxRow = -Infinity;
-  let minCol = Infinity;
-  let maxCol = -Infinity;
-
-  Object.keys(table).forEach((row) => {
-    const rowNum = Number(row);
-    minRow = Math.min(minRow, rowNum);
-    maxRow = Math.max(maxRow, rowNum);
-
-    Object.keys(table[row]).forEach((col) => {
-      const colNum = Number(col);
-      minCol = Math.min(minCol, colNum);
-      maxCol = Math.max(maxCol, colNum);
-    });
-  });
-
-  // Print table
-  for (let row = minRow; row <= maxRow; row++) {
-    let line = "";
-    for (let col = minCol; col <= maxCol; col++) {
-      if (table[row]?.[col]) {
-        line += ("|" + stringifyCoord(table[row][col]) + " ").padEnd(15, " ");
-      } else {
-        line += "|.".padEnd(15, " ");
-      }
-    }
-    console.log(line);
+  const [key, ...rest] = path;
+  obj[key] = obj[key] || {};
+  if (rest.length > 0) {
+    set(obj[key], rest, value);
+  } else {
+    obj[key] = value;
   }
 };

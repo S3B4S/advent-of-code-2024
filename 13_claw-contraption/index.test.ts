@@ -1,5 +1,5 @@
 import { expect } from "jsr:@std/expect";
-import { solvePart1, solvePart2 } from "./index.ts";
+import { solve } from "./index.ts";
 import { testWrapper } from "../utils/misc.ts";
 
 let fileInput: string;
@@ -32,7 +32,7 @@ Prize: X=18641, Y=10279
 testWrapper("Day 13", () => {
   Deno.test("Part 1 - First machine of example input", () => {
     expect(
-      solvePart1(`
+      solve(`
 Button A: X+94, Y+34
 Button B: X+22, Y+67
 Prize: X=8400, Y=5400
@@ -44,7 +44,7 @@ Prize: X=8400, Y=5400
     "Part 1 - First machine of example input made smaller, 4 button presses each needed",
     () => {
       expect(
-        solvePart1(`
+        solve(`
 Button A: X+94, Y+34
 Button B: X+22, Y+67
 Prize: X=464, Y=404
@@ -54,36 +54,18 @@ Prize: X=464, Y=404
   );
 
   Deno.test("Part 1 - Example input", () => {
-    expect(solvePart1(exampleInput)).toEqual(480);
+    expect(solve(exampleInput)).toEqual(480);
   });
 
   Deno.test("Part 1 - File input", () => {
-    expect(solvePart1(fileInput)).toEqual(36571);
+    expect(solve(fileInput)).toEqual(36571);
   });
 
   Deno.test("Part 2 - Example input", () => {
-    expect(
-      solvePart1(`
-Button A: X+94, Y+34
-Button B: X+22, Y+67
-Prize: X=10000000008400, Y=10000000005400
-
-Button A: X+26, Y+66
-Button B: X+67, Y+21
-Prize: X=10000000012748, Y=10000000012176
-
-Button A: X+17, Y+86
-Button B: X+84, Y+37
-Prize: X=10000000007870, Y=10000000006450
-
-Button A: X+69, Y+23
-Button B: X+27, Y+71
-Prize: X=10000000018641, Y=10000000010279
-`)
-    ).toEqual(1);
+    expect(solve(exampleInput, true)).toEqual(875318608908);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - File input", () => {
+    expect(solve(fileInput, true)).toEqual(85527711500010);
   });
 });
