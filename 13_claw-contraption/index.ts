@@ -69,18 +69,12 @@ export const solvePart1 = (input: string) => {
     });
     viableLocations = [];
 
-    solveRecPart1(
-      machine,
-      {
-        col: machine.prize.x,
-        row: machine.prize.y,
-      },
-      0,
-      0
-    );
+    solveRecPart1(machine, {
+      col: machine.prize.x,
+      row: machine.prize.y,
+    });
 
     const x = viableLocations.sort((a, b) => a.cost - b.cost)[0];
-    // console.log(viableLocations);
     if (x) {
       outcome += x.cost;
     }
@@ -107,49 +101,37 @@ let mem = {} as Record<string, Record<string, Coordinate>>;
 
 let viableLocations = [] as { coord: Coordinate; cost: number }[];
 
-const solveRecPart1 = (
-  machine: Machine,
-  goal: Coordinate,
-  amountOfPressesA: number,
-  amountOfPressesB: number
-) => {
-  if (amountOfPressesA > 100 || amountOfPressesB > 100) {
-    return Infinity;
-  }
+const solveRecPart1 = (machine: Machine, goal: Coordinate) => {
+  for (let b = 0; b < 100; b++) {
+    for (let a = 0; a < 100; a++) {
+      const current = mem[a][b];
 
-  const current = mem[amountOfPressesA][amountOfPressesB];
+      if (!current) break;
+      if (current.col > goal.col || current.row > goal.row) break;
 
-  // console.log();
-  // console.log("current: ", amountOfPressesA, amountOfPressesB);
-  // printTable(mem);
+      if (equalCoordinates(current, goal)) {
+        viableLocations.push({
+          coord: current,
+          cost: a * Tokens.A + b * Tokens.B,
+        });
+      }
 
-  if (current.col > goal.col || current.row > goal.row) return;
+      if (!mem[a + 1]?.[b]) {
+        // We press button A:
+        set(mem, [a + 1, b], {
+          col: current.col + machine.a.x,
+          row: current.row + machine.a.y,
+        });
+      }
 
-  if (equalCoordinates(current, goal)) {
-    viableLocations.push({
-      coord: current,
-      cost: amountOfPressesA * Tokens.A + amountOfPressesB * Tokens.B,
-    });
-  }
-
-  if (!mem[amountOfPressesA + 1]?.[amountOfPressesB]) {
-    // We press button A:
-    set(mem, [amountOfPressesA + 1, amountOfPressesB], {
-      col: current.col + machine.a.x,
-      row: current.row + machine.a.y,
-    });
-
-    solveRecPart1(machine, goal, amountOfPressesA + 1, amountOfPressesB);
-  }
-
-  // We press button B:
-  if (!mem[amountOfPressesA]?.[amountOfPressesB + 1]) {
-    set(mem, [amountOfPressesA, amountOfPressesB + 1], {
-      col: current.col + machine.b.x,
-      row: current.row + machine.b.y,
-    });
-
-    solveRecPart1(machine, goal, amountOfPressesA, amountOfPressesB + 1);
+      // We press button B:
+      if (!mem[a]?.[b + 1]) {
+        set(mem, [a, b + 1], {
+          col: current.col + machine.b.x,
+          row: current.row + machine.b.y,
+        });
+      }
+    }
   }
 };
 
