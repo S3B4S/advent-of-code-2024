@@ -1,8 +1,4 @@
-import {
-  Coordinate,
-  equalCoordinates,
-  stringifyCoord,
-} from "../utils/board.ts";
+import { Coordinate, equalCoordinates } from "../utils/board.ts";
 
 const Regex = {
   A: /Button A: X\+(\d+), Y\+(\d+)/,
