@@ -45,7 +45,7 @@ export const getFileInput = (dir: string) =>
  *  .map(x => x.trim())
  * ```
  */
-export const logId = (yourDreamsAndHopes: unknown) => {
+export const logId = (yourDreamsAndHopes: any) => {
   console.log(yourDreamsAndHopes);
   return yourDreamsAndHopes;
 };

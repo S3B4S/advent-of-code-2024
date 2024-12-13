@@ -12,10 +12,18 @@ import {
 export class Pawn {
   private _board: Board<PropertyKey, number>;
   currentPosition: Coordinate;
+  currentDirection: Direction;
+  lastPosition: Coordinate | undefined;
 
-  constructor(board: Board<PropertyKey, number>, startingPosition: Coordinate) {
+  constructor(
+    board: Board<PropertyKey, number>,
+    startingPosition: Coordinate,
+    currentDirection: Direction = Direction.N
+  ) {
     this._board = board;
     this.currentPosition = startingPosition;
+    this.currentDirection = currentDirection;
+    this.lastPosition = undefined;
   }
 
   step(direction: Direction, n: number = 1) {
@@ -40,7 +48,9 @@ export class Pawn {
     n: number = 1
   ) {
     const peekNextStep = this.predictPosition(direction, n);
-    if (!this._board.isWithinBounds(peekNextStep)) return false;
+    if (!this._board.isWithinBounds(peekNextStep)) {
+      return false;
+    }
     const nextDirection = callback(
       peekNextStep,
       this._board.getCell(peekNextStep)!
@@ -53,6 +63,52 @@ export class Pawn {
 
     // Turning is also a "step"
     return true;
+  }
+
+  /**
+   * Peek ahead and based on the value of the upcoming tile, you can change directions
+   * @param callback coord is the next position the pawn goes to
+   * @param direction
+   * @param n
+   * @returns true if a step was taken, false if not (due to out of bounds for example)
+   */
+  conditionalNextStepV2(
+    callback: (args: {
+      currentCoordinate: Coordinate;
+      currentDirection: Direction;
+      potentialCoordinates: { coord: Coordinate; value: string | undefined }[];
+    }) => {
+      newDirection: Direction;
+      newPosition: Coordinate;
+    },
+    determineNewPosCallback: (args: {
+      currentPos: Coordinate;
+      currentDir: Direction;
+    }) => Coordinate[]
+  ) {
+    const potentialCoordinates = determineNewPosCallback({
+      currentPos: this.currentPosition,
+      currentDir: this.currentDirection,
+    }).map((coord) => ({
+      coord,
+      value: this._board.safeGetCell(coord) as string,
+    }));
+
+    const res = callback({
+      currentCoordinate: this.currentPosition,
+      currentDirection: this.currentDirection,
+      potentialCoordinates,
+    });
+
+    this.currentPosition = res.newPosition;
+    this.currentDirection = res.newDirection;
+
+    return res;
+  }
+
+  setCurrentPosition(coord: Coordinate) {
+    this.lastPosition = this.currentPosition;
+    this.currentPosition = coord;
   }
 
   /**

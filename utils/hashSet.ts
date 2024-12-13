@@ -36,12 +36,28 @@ export class HashSet<T> extends Set<string> {
   }
 
   /**
+   * @deprecated Please use `remove` instead
+   */
+  override delete(value: string): boolean {
+    return super.delete(value);
+  }
+
+  /**
    * Check if the hash set contains a value
    * @param value
    * @returns
    */
   contains(value: T) {
     return this.has(this.hashFn(value));
+  }
+
+  /**
+   * Remove an element from the hash set
+   * @param value
+   * @returns
+   */
+  remove(value: T) {
+    return this.delete(this.hashFn(value));
   }
 
   /**

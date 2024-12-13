@@ -165,20 +165,23 @@ export class Board<K extends PropertyKey, V extends number> {
    */
   neighbours(
     currentCoords: Coordinate,
-    customRelativeCoords?: Direction[],
+    allowlistDirections?: Direction[],
     distance: number = 1
   ) {
     let neighboursRelativeCoordinates;
 
-    if (customRelativeCoords) {
-      neighboursRelativeCoordinates = (
-        Object.entries(relativeCoords) as [Direction, Coordinate][]
-      )
-        .filter(([dir]) => customRelativeCoords.includes(dir))
-        .map(([dir, coords]) => ({
-          col: coords.col * distance,
-          row: coords.row * distance,
-        }));
+    if (allowlistDirections) {
+      neighboursRelativeCoordinates = allowlistDirections.map(
+        (dir) => relativeCoords[dir]
+      );
+      // (
+      //   Object.entries(relativeCoords) as [Direction, Coordinate][]
+      // )
+      //   .filter(([dir]) => customRelativeCoords.includes(dir))
+      //   .map(([dir, coords]) => ({
+      //     col: coords.col * distance,
+      //     row: coords.row * distance,
+      //   }));
     } else {
       neighboursRelativeCoordinates = relativeCoordsList.map((coords) => ({
         col: coords.col * distance,
@@ -296,13 +299,28 @@ export const turn90DegreesClockWise = (direction: Direction): Direction => {
   return (
     {
       [Direction.N]: Direction.E,
-      [Direction.NE]: Direction.NW,
+      [Direction.NE]: Direction.SE,
       [Direction.E]: Direction.S,
-      [Direction.NW]: Direction.SE,
-      [Direction.S]: Direction.W,
       [Direction.SE]: Direction.SW,
+      [Direction.S]: Direction.W,
+      [Direction.SW]: Direction.NW,
       [Direction.W]: Direction.N,
-      [Direction.SW]: Direction.NE,
+      [Direction.NW]: Direction.NE,
+    }[direction] || Direction.N
+  );
+};
+
+export const turn45DegreesClockWise = (direction: Direction): Direction => {
+  return (
+    {
+      [Direction.N]: Direction.NE,
+      [Direction.NE]: Direction.E,
+      [Direction.E]: Direction.SE,
+      [Direction.SE]: Direction.S,
+      [Direction.S]: Direction.SW,
+      [Direction.SW]: Direction.W,
+      [Direction.W]: Direction.NW,
+      [Direction.NW]: Direction.N,
     }[direction] || Direction.N
   );
 };
@@ -320,6 +338,23 @@ export const turn90DegreesCounterClockwise = (
       [Direction.SE]: Direction.NE,
       [Direction.E]: Direction.N,
       [Direction.NE]: Direction.NW,
+    }[direction] || Direction.N
+  );
+};
+
+export const turn45DegreesCounterClockwise = (
+  direction: Direction
+): Direction => {
+  return (
+    {
+      [Direction.N]: Direction.NW,
+      [Direction.NW]: Direction.W,
+      [Direction.W]: Direction.SW,
+      [Direction.SW]: Direction.S,
+      [Direction.S]: Direction.SE,
+      [Direction.SE]: Direction.E,
+      [Direction.E]: Direction.NE,
+      [Direction.NE]: Direction.N,
     }[direction] || Direction.N
   );
 };

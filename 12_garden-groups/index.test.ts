@@ -88,11 +88,42 @@ testWrapper("Day 12", () => {
     expect(solvePart1(fileInput)).toEqual(1363682);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input", () => {
+    expect(solvePart2(exampleInput)).toEqual(80);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
+  Deno.test("Part 2 - Example input 2", () => {
+    expect(
+      solvePart2(
+        `
+OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO
+`.trim()
+      )
+    ).toEqual(436);
+  });
+
+  Deno.test("Part 2 - Example input 3", () => {
+    expect(
+      solvePart2(
+        `
+EEEEE
+EXXXX
+EEEEE
+EXXXX
+EEEEE
+`.trim()
+      )
+    ).toEqual(236);
+  });
+
+  // 4499 too low
+  // 192569 too low
+  // 789056 too high
+  Deno.test("Part 2 - File input", () => {
     expect(solvePart2(fileInput)).toEqual(0);
   });
 
