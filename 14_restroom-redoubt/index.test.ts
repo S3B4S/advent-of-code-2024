@@ -55,6 +55,7 @@ testWrapper("Day 14", () => {
     expect(solvePart1(fileInput)).toEqual(219512160);
   });
 
+  // For part 2 we are visually inspecting the output, so we ignore it.
   Deno.test.ignore("Part 2 - Example input", () => {
     expect(solvePart2(exampleInput)).toEqual(0);
   });

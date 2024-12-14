@@ -129,7 +129,7 @@ export const solvePart1 = (
   return Object.values(countPerQuadrant).reduce((a, b) => a * b, 1);
 };
 
-export const solvePart2 = (
+export const solvePart2 = async (
   input: string,
   {
     nSeconds,
@@ -146,5 +146,58 @@ export const solvePart2 = (
     height: 103,
   }
 ) => {
+  const board = new Board(Spaces.OPEN.repeat(width * height), width, height);
+
+  const pawns = [];
+
+  for (const line of input.trim().split("\n")) {
+    const match = line.match(REGEX)!;
+    const [px, py, vx, vy] = match?.slice(1, 5).map((x) => Number(x));
+
+    pawns.push(
+      new Pawn<{ vx: number; vy: number }>(
+        board,
+        { col: px, row: py },
+        Direction.N,
+        {
+          vx,
+          vy,
+        }
+      )
+    );
+  }
+
+  for (let i = 0; i < nSeconds; i++) {
+    pawns.forEach((pawn) => {
+      const { vx, vy } = pawn.context!;
+
+      const nextPosition = addCoordinates(pawn.currentPosition, {
+        col: vx,
+        row: vy,
+      });
+
+      if (nextPosition.col < 0) {
+        nextPosition.col = width + nextPosition.col;
+      } else if (nextPosition.col >= width) {
+        nextPosition.col = nextPosition.col - width;
+      }
+
+      if (nextPosition.row < 0) {
+        nextPosition.row = height + nextPosition.row;
+      } else if (nextPosition.row >= height) {
+        nextPosition.row = nextPosition.row - height;
+      }
+
+      board.setCell(Spaces.OPEN, pawn.currentPosition);
+      pawn.setCurrentPosition(nextPosition);
+      board.setCell(Spaces.WALL, pawn.currentPosition);
+    });
+
+    console.log(i);
+    console.log(board.toString());
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
   return 0;
 };
