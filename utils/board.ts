@@ -171,9 +171,13 @@ export class Board<K extends PropertyKey, V extends number> {
     let neighboursRelativeCoordinates;
 
     if (allowlistDirections) {
-      neighboursRelativeCoordinates = allowlistDirections.map(
-        (dir) => relativeCoords[dir]
-      );
+      neighboursRelativeCoordinates = allowlistDirections.map((dir) => {
+        const relCoord = relativeCoords[dir];
+        return {
+          col: relCoord.col * distance,
+          row: relCoord.row * distance,
+        };
+      });
       // (
       //   Object.entries(relativeCoords) as [Direction, Coordinate][]
       // )

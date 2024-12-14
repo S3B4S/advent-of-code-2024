@@ -5,9 +5,10 @@ import { HashSet } from "../utils/hashSet.ts";
 
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
+  const height = input.trim().split("\n").length;
   const inputAsStr = input.trim().replaceAll("\n", "");
 
-  const board = new Board(inputAsStr, width);
+  const board = new Board(inputAsStr, width, height);
 
   // BFS
   // Also backtrack to find out which nodes will lead to a successful path
@@ -64,9 +65,10 @@ export const solvePart1 = (input: string) => {
 
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
+  const height = input.trim().split("\n").length;
   const inputAsStr = input.trim().replaceAll("\n", "");
 
-  const board = new Board(inputAsStr, width);
+  const board = new Board(inputAsStr, width, height);
 
   // BFS
   // Also backtrack to find out which nodes will lead to a successful path

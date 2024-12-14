@@ -122,7 +122,7 @@ export const solvePart1 = (input: string) => {
 
   const asString = input.replaceAll("\n", "");
 
-  const board = new Board(asString, width);
+  const board = new Board(asString, width, height);
 
   const hashmapColsSorted: Record<number, Coordinate[]> = {};
   const hashmapRowsSorted: Record<number, Coordinate[]> = {};
@@ -256,7 +256,7 @@ export const solvePart2 = (input: string) => {
   //   "<": 13,
   // });
 
-  const board = new Board(asString, width);
+  const board = new Board(asString, width, height);
 
   const placedObjectsHashMap = new HashSet<Coordinate>(stringifyCoord);
 
@@ -264,16 +264,16 @@ export const solvePart2 = (input: string) => {
     board.setCell(".", startingCoord);
     let currentDirection = Direction.N;
 
-    const pawn = new Pawn(board, startingCoord);
+    const pawn = new Pawn<undefined>(board, startingCoord);
 
     for (let i = 0; i < width * height; i++) {
       const hasTakenAction = pawn.conditionalNextStep(
         (predictedStep, value) => {
           if (value === ".") {
-            const newBoard = new Board(asString, width);
+            const newBoard = new Board(asString, width, height);
             newBoard.setCell("#", predictedStep);
             newBoard.setCell(".", startingCoord);
-            const ghost = new Pawn(newBoard, pawn.currentPosition);
+            const ghost = new Pawn<undefined>(newBoard, pawn.currentPosition);
             const hasLoop = detectLoop(
               ghost,
               turn90DegreesClockWise(currentDirection)
@@ -299,7 +299,7 @@ export const solvePart2 = (input: string) => {
   return placedObjectsHashMap.size;
 };
 
-const detectLoop = (pawn: Pawn, direction: Direction) => {
+const detectLoop = (pawn: Pawn<undefined>, direction: Direction) => {
   const visited = new HashSet<{ coord: Coordinate; dir: Direction }>(
     ({ coord, dir }) => stringifyCoordDirection(coord, dir)
   );

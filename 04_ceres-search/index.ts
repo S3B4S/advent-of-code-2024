@@ -16,8 +16,9 @@ const encoding = new BijectiveMap<PropertyKey, number>({
 
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
+  const height = input.trim().split("\n").length;
   const asString = input.trim().replaceAll("\n", "");
-  const board = new Board(asString, width);
+  const board = new Board(asString, width, height);
 
   let count = 0;
   board.iterateOver("X", ({ col, row }) => {
@@ -61,8 +62,9 @@ const crossDirections = [
 
 export const solvePart2 = (input: string) => {
   const width = input.trim().split("\n")[0].length;
+  const height = input.trim().split("\n").length;
   const asString = input.trim().replaceAll("\n", "");
-  const board = new Board(asString, width);
+  const board = new Board(asString, width, height);
 
   let count = 0;
 

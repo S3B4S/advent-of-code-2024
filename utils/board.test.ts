@@ -12,8 +12,9 @@ Deno.test("Parse board", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   expect(board.encoding.getY("#")).toBe(0);
   expect(board.encoding.getY(".")).toBe(1);
@@ -30,8 +31,9 @@ Deno.test("Should find M in the board with an unsafe method", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   expect(board.getCell({ col: 2, row: 2 })).toBe("M");
 });
@@ -48,8 +50,9 @@ Deno.test(
   `;
 
     const width = input.trim().split("\n")[0].trim().length;
+    const height = input.trim().split("\n").length;
     const asStr = input.trim().replaceAll(/\s/g, "").trim();
-    const board = new Board(asStr, width);
+    const board = new Board(asStr, width, height);
 
     expect(() => {
       board.getCell({ col: 10, row: 10 });
@@ -67,8 +70,9 @@ Deno.test("Should find M in the board with a safe method", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   expect(board.safeGetCell({ col: 2, row: 2 })).toBe("M");
 });
@@ -85,8 +89,9 @@ Deno.test(
   `;
 
     const width = input.trim().split("\n")[0].trim().length;
+    const height = input.trim().split("\n").length;
     const asStr = input.trim().replaceAll(/\s/g, "").trim();
-    const board = new Board(asStr, width);
+    const board = new Board(asStr, width, height);
 
     expect(board.safeGetCell({ col: 10, row: 10 })).toBeUndefined();
   }
@@ -104,8 +109,9 @@ Deno.test(
   `;
 
     const width = input.trim().split("\n")[0].trim().length;
+    const height = input.trim().split("\n").length;
     const asStr = input.trim().replaceAll(/\s/g, "").trim();
-    const board = new Board(asStr, width);
+    const board = new Board(asStr, width, height);
 
     expect(board.allPossibleCharacters()).toEqual(["#", ".", "M"]);
   }
@@ -121,8 +127,9 @@ Deno.test("Should set a cell value correctly", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   board.setCell("X", { col: 2, row: 2 });
   expect(board.getCell({ col: 2, row: 2 })).toBe("X");
@@ -138,8 +145,9 @@ Deno.test("Should correctly find neighbours", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const neighbours = board.neighbours({ col: 2, row: 2 });
   expect(neighbours).toEqual([
@@ -164,8 +172,9 @@ Deno.test("Should find neighbours with custom directions", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const neighbours = board.neighbours({ col: 2, row: 2 }, [
     Direction.N,
@@ -187,8 +196,9 @@ Deno.test("Should find neighbours with custom distance", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const neighbours = board.neighbours(
     { col: 2, row: 2 },
@@ -209,8 +219,9 @@ Deno.test("Should iterate over cells correctly", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const visited: string[] = [];
   board.iterateOverCells((value, coord) => {
@@ -238,8 +249,9 @@ Deno.test("Should convert board to string correctly", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const expected = "\n###\n#M#\n###";
   expect(board.toString()).toBe(expected);
@@ -253,8 +265,9 @@ Deno.test("Should get positions by key", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const mPositions = board.getPositionsByKey("M" as any);
   expect(mPositions).toEqual([{ col: 1, row: 1 }]);
@@ -271,8 +284,9 @@ Deno.test("Should iterate over specific character positions", () => {
   `;
 
   const width = input.trim().split("\n")[0].trim().length;
+  const height = input.trim().split("\n").length;
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
-  const board = new Board(asStr, width);
+  const board = new Board(asStr, width, height);
 
   const visited: string[] = [];
   board.iterateOver("#" as any, (coord) => {
@@ -292,8 +306,9 @@ Deno.test(
   `;
 
     const width = input.trim().split("\n")[0].trim().length;
+    const height = input.trim().split("\n").length;
     const asStr = input.trim().replaceAll(/\s/g, "").trim();
-    const board = new Board(asStr, width);
+    const board = new Board(asStr, width, height);
 
     // Initial state should have # and M
     expect(board.allPossibleCharacters()).toEqual(["#", "M"]);
@@ -319,8 +334,9 @@ Deno.test(
   `;
 
     const width = input.trim().split("\n")[0].trim().length;
+    const height = input.trim().split("\n").length;
     const asStr = input.trim().replaceAll(/\s/g, "").trim();
-    const board = new Board(asStr, width);
+    const board = new Board(asStr, width, height);
 
     // The ring of #
     expect(board.getPositionsByKey("#")).toEqual([
