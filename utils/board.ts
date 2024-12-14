@@ -204,7 +204,6 @@ export class Board<K extends PropertyKey, V extends number> {
    * @param column - The column of the cell to check
    * @param row - The row of the cell to check
    * @returns true if the cell is within the bounds of the board, false otherwise
-   * @TODO _width needs to be updated here
    */
   isWithinBounds(coord: Coordinate): boolean {
     return (
@@ -259,7 +258,7 @@ export class Board<K extends PropertyKey, V extends number> {
    * @TODO shouldn't be undefined
    */
   iterateOverCells(callback: (value: string, coord: Coordinate) => void): void {
-    for (let row = 0; row < this._width; row++) {
+    for (let row = 0; row < this._height; row++) {
       for (let col = 0; col < this._width; col++) {
         const currCoord = { col, row };
         callback(this.getCell(currCoord) as string, currCoord);

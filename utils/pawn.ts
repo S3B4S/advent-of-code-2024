@@ -9,21 +9,24 @@ import {
 /**
  * A pawn is something you can place on a board and move around
  */
-export class Pawn {
+export class Pawn<Context> {
   private _board: Board<PropertyKey, number>;
   currentPosition: Coordinate;
   currentDirection: Direction;
   lastPosition: Coordinate | undefined;
+  context: Context | undefined;
 
   constructor(
     board: Board<PropertyKey, number>,
     startingPosition: Coordinate,
-    currentDirection: Direction = Direction.N
+    currentDirection: Direction = Direction.N,
+    context?: Context
   ) {
     this._board = board;
     this.currentPosition = startingPosition;
     this.currentDirection = currentDirection;
     this.lastPosition = undefined;
+    this.context = context;
   }
 
   step(direction: Direction, n: number = 1) {
