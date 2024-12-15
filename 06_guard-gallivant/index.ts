@@ -1,8 +1,6 @@
 import { BijectiveMap } from "../utils/bijectiveMap.ts";
 import {
-  addCoordinates,
   Coordinate,
-  relativeCoords,
   stringifyCoord,
   stringifyCoordDirection,
   turn90DegreesClockWise,

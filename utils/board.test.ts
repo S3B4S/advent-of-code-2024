@@ -1,5 +1,4 @@
 import { expect } from "jsr:@std/expect";
-import { forEachPair } from "./list.ts";
 import { Board, Direction } from "./board.ts";
 
 Deno.test("Parse board", () => {
@@ -269,10 +268,10 @@ Deno.test("Should get positions by key", () => {
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
   const board = new Board(asStr, width, height);
 
-  const mPositions = board.getPositionsByKey("M" as any);
+  const mPositions = board.getPositionsByKey("M");
   expect(mPositions).toEqual([{ col: 1, row: 1 }]);
 
-  const wallPositions = board.getPositionsByKey("#" as any);
+  const wallPositions = board.getPositionsByKey("#");
   expect(wallPositions.length).toBe(8);
 });
 
@@ -289,7 +288,7 @@ Deno.test("Should iterate over specific character positions", () => {
   const board = new Board(asStr, width, height);
 
   const visited: string[] = [];
-  board.iterateOver("#" as any, (coord) => {
+  board.iterateOver("#", (coord) => {
     visited.push(`${coord.col},${coord.row}`);
   });
 

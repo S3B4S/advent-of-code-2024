@@ -1,4 +1,3 @@
-import { CHAR_HYPHEN_MINUS } from "https://deno.land/std@0.224.0/path/_common/constants.ts";
 import { BijectiveMap } from "./bijectiveMap.ts";
 
 // prettier-ignore
@@ -265,7 +264,7 @@ export class Board<K extends PropertyKey, V extends number> {
 
   allPossibleCharacters() {
     return (Object.entries(this._positionsByKey) as [K, Coordinate[]][])
-      .filter(([key, value]) => value.length > 0)
+      .filter(([_, value]) => value.length > 0)
       .map(([key]) => key);
   }
 

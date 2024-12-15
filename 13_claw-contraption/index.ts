@@ -59,10 +59,7 @@ export const solve = (input: string, isPart2: boolean = false) => {
 
   // To solve with linear algebra
   machines.forEach((machine) => {
-    const cost = solveWithLA(machine, {
-      col: machine.prize.x,
-      row: machine.prize.y,
-    });
+    const cost = solveWithLA(machine);
 
     if (cost) {
       outcome += cost;
@@ -80,7 +77,7 @@ export const solve = (input: string, isPart2: boolean = false) => {
   //   });
   //   viableLocations = [];
 
-  //   solveWithDP(machine, {
+  //   _solveWithDP(machine, {
   //     col: machine.prize.x,
   //     row: machine.prize.y,
   //   });
@@ -95,7 +92,7 @@ export const solve = (input: string, isPart2: boolean = false) => {
   return outcome;
 };
 
-const solveWithLA = (machine: Machine, goal: Coordinate) => {
+const solveWithLA = (machine: Machine) => {
   const a = machine.prize.y;
   const b = machine.a.y;
   const c = machine.b.y;
@@ -112,10 +109,10 @@ const solveWithLA = (machine: Machine, goal: Coordinate) => {
   return undefined;
 };
 
-let mem = {} as Record<string, Record<string, Coordinate>>;
-let viableLocations = [] as { coord: Coordinate; cost: number }[];
+const mem = {} as Record<string, Record<string, Coordinate>>;
+const viableLocations = [] as { coord: Coordinate; cost: number }[];
 
-const solveWithDP = (machine: Machine, goal: Coordinate) => {
+const _solveWithDP = (machine: Machine, goal: Coordinate) => {
   for (let b = 0; b < 100; b++) {
     for (let a = 0; a < 100; a++) {
       const current = mem[a][b];
@@ -150,14 +147,14 @@ const solveWithDP = (machine: Machine, goal: Coordinate) => {
 };
 
 const set = (
-  obj: Record<string, any>,
+  obj: Record<string, unknown>,
   path: (string | number)[],
-  value: any
+  value: unknown
 ) => {
   const [key, ...rest] = path;
   obj[key] = obj[key] || {};
   if (rest.length > 0) {
-    set(obj[key], rest, value);
+    set(obj[key] as Record<string, unknown>, rest, value);
   } else {
     obj[key] = value;
   }

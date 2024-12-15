@@ -90,7 +90,7 @@ export const solvePart1 = (
     );
   }
 
-  let countPerQuadrant = {
+  const countPerQuadrant = {
     "top-left": 0,
     "top-right": 0,
     "bottom-left": 0,

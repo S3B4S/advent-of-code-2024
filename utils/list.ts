@@ -28,7 +28,7 @@ export const forEachPair = <T>(callback: (a: T, b: T) => void, list: T[]) => {
  * @param index - The index of the item to remove
  * @returns updated array
  */
-export const removeFromArray = (array: any[], index: number) => {
+export const removeFromArray = (array: unknown[], index: number) => {
   array.splice(index, 1);
 };
 
@@ -39,7 +39,11 @@ export const removeFromArray = (array: any[], index: number) => {
  * @param item
  * @returns
  */
-export const insertInArray = (array: any[], index: number, item: any) => {
+export const insertInArray = (
+  array: unknown[],
+  index: number,
+  item: unknown
+) => {
   array.splice(index, 0, item);
 };
 

@@ -1,4 +1,3 @@
-import { BijectiveMap } from "../utils/bijectiveMap.ts";
 import {
   addCoordinates,
   Board,
@@ -6,13 +5,6 @@ import {
   relativeCoords,
 } from "../utils/board.ts";
 import { partition } from "ramda";
-
-const encoding = new BijectiveMap<PropertyKey, number>({
-  X: 1,
-  M: 2,
-  A: 3,
-  S: 4,
-});
 
 export const solvePart1 = (input: string) => {
   const width = input.trim().split("\n")[0].length;

@@ -33,7 +33,7 @@ MIIISIJEEE
 MMMISSJEEE
 `.trim();
 
-const isolateBug = `
+const __isolateBug = `
 ........FF
 .........F
 .......FFF
@@ -84,7 +84,7 @@ testWrapper("Day 12", () => {
   });
 
   // Deno.test.only("Part 2 - Isolate bug", () => {
-  //   expect(solvePart2(isolateBug)).toEqual(12);
+  //   expect(solvePart2(_isolateBug)).toEqual(12);
   // });
 
   Deno.test("Part 2 - Example input 4", () => {
