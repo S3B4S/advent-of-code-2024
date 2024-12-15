@@ -64,6 +64,13 @@ export const addCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
   };
 };
 
+export const addDirectionToCoordinate = (
+  coord: Coordinate,
+  direction: Direction
+) => {
+  return addCoordinates(coord, relativeCoords[direction]);
+};
+
 export const subtractCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
   return {
     col: coordA.col - coordB.col,
@@ -90,6 +97,13 @@ export class Board<K extends PropertyKey, V extends number> {
   private _height: number;
   // X will be the readable characters, Y will be the encoded values (numbers)
   encoding: BijectiveMap<K, V> = new BijectiveMap<K, V>();
+
+  static fromUnparsedBoard(unparsedBoard: string) {
+    const width = unparsedBoard.trim().indexOf("\n");
+    const height = unparsedBoard.trim().split("\n").length;
+    const boardAsStr = unparsedBoard.trim().replaceAll(/\s/g, "");
+    return new Board<string, number>(boardAsStr, width, height);
+  }
 
   constructor(boardAsStr: string, width: number, height: number) {
     this._board = new Uint8Array(boardAsStr.length);
