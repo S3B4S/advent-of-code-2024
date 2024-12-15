@@ -61,11 +61,29 @@ testWrapper("Day 15", () => {
     expect(solvePart1(fileInput)).toEqual(1438161);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(smallExampleInput)).toEqual(0);
+  Deno.test.ignore("Part 2 - [DEBUG] Small example input", () => {
+    expect(
+      solvePart2(
+        `
+#######
+#...#.#
+#.....#
+#..OO@#
+#..O..#
+#.....#
+#######
+
+<vv<<^^<<^^
+`.trim()
+      )
+    ).toEqual(0);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - Large example input", () => {
+    expect(solvePart2(largeExampleInput)).toEqual(9021);
+  });
+
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(1437981);
   });
 });

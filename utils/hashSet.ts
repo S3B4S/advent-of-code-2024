@@ -1,7 +1,8 @@
 /**
- * A set that uses a hash function to store values
+ * A set that uses a hash function to store values.
+ *
  * This is useful when you want to store more complex types in a set,
- * and want to compare them using the hash function
+ * and want to compare them using the hash function.
  * @param T The type of the values to store
  */
 export class HashSet<T> extends Set<string> {
@@ -20,12 +21,26 @@ export class HashSet<T> extends Set<string> {
   }
 
   /**
+   * @TODO fix this
+   * @param other
+   * @returns
+   */
+  unionX(other: HashSet<T>) {
+    const set = this.union(other);
+    const newHashSet = new HashSet(this.hashFn);
+    for (const s of set.values()) {
+      newHashSet.add(s);
+    }
+    return newHashSet;
+  }
+
+  /**
    * Explicitly disable the add method on HashSet, we want to use `include` instead
    * @deprecated Please use `include` instead
    * @returns This instance
    */
-  override add() {
-    return this;
+  override add(value: string) {
+    return super.add(value);
   }
 
   /**
