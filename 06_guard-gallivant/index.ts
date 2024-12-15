@@ -246,15 +246,15 @@ export const solvePart2 = (input: string) => {
 
   const asString = input.replaceAll("\n", "");
 
-  // const encoding = new BijectiveMap<string, number>({
-  //   ".": 0,
-  //   "^": 1,
-  //   "#": 2,
-  //   A: 10,
-  //   ">": 11,
-  //   v: 12,
-  //   "<": 13,
-  // });
+  const encoding = new BijectiveMap<string, number>({
+    ".": 0,
+    "^": 1,
+    "#": 2,
+    A: 10,
+    ">": 11,
+    v: 12,
+    "<": 13,
+  });
 
   const board = new Board(asString, width, height);
 
@@ -269,6 +269,16 @@ export const solvePart2 = (input: string) => {
     for (let i = 0; i < width * height; i++) {
       const hasTakenAction = pawn.conditionalNextStep(
         (predictedStep, value) => {
+          // Below is necessary to get the right answer, but not sure why
+          // Ideally I'd like to remove it
+          // @TODO
+          board.setCell(
+            encoding.getX(
+              directionNums[currentDirection as keyof typeof directionNums]
+            )!,
+            pawn.currentPosition
+          );
+
           if (value === ".") {
             const newBoard = new Board(asString, width, height);
             newBoard.setCell("#", predictedStep);
