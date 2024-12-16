@@ -148,7 +148,7 @@ Deno.test("Should correctly find neighbours", () => {
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
   const board = new Board(asStr, width, height);
 
-  const neighbours = board.neighbours({ col: 2, row: 2 });
+  const neighbours = board.getNeighbours({ col: 2, row: 2 });
   expect(neighbours).toEqual([
     { col: 1, row: 1 },
     { col: 2, row: 1 },
@@ -175,7 +175,7 @@ Deno.test("Should find neighbours with custom directions", () => {
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
   const board = new Board(asStr, width, height);
 
-  const neighbours = board.neighbours({ col: 2, row: 2 }, [
+  const neighbours = board.getNeighbours({ col: 2, row: 2 }, [
     Direction.N,
     Direction.S,
   ]);
@@ -199,7 +199,7 @@ Deno.test("Should find neighbours with custom distance", () => {
   const asStr = input.trim().replaceAll(/\s/g, "").trim();
   const board = new Board(asStr, width, height);
 
-  const neighbours = board.neighbours(
+  const neighbours = board.getNeighbours(
     { col: 2, row: 2 },
     [Direction.N, Direction.S],
     2

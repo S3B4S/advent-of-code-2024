@@ -35,7 +35,7 @@ export const solvePart1 = (input: string) => {
     while (!toVisitList.isEmpty()) {
       const { coord: visiting, lookingFor, path } = toVisitList.remove()!;
 
-      for (const neighbour of board.neighbours(visiting, [
+      for (const neighbour of board.getNeighbours(visiting, [
         Direction.N,
         Direction.E,
         Direction.S,
@@ -92,7 +92,7 @@ export const solvePart2 = (input: string) => {
     while (!toVisitList.isEmpty()) {
       const { coord: visiting, lookingFor, path } = toVisitList.remove()!;
 
-      for (const neighbour of board.neighbours(visiting, [
+      for (const neighbour of board.getNeighbours(visiting, [
         Direction.N,
         Direction.E,
         Direction.S,

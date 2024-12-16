@@ -176,7 +176,7 @@ export class Board<K extends PropertyKey, V extends number> {
   /**
    * @TODO
    */
-  neighbours(
+  getNeighbours(
     currentCoords: Coordinate,
     allowlistDirections?: Direction[],
     distance: number = 1

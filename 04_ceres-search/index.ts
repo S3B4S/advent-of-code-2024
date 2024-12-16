@@ -15,7 +15,7 @@ export const solvePart1 = (input: string) => {
   let count = 0;
   board.iterateOver("X", ({ col, row }) => {
     const mNeighbours = board
-      .neighbours({ col, row })
+      .getNeighbours({ col, row })
       .filter(
         (neighbour) =>
           board.getCell({ col: neighbour.col, row: neighbour.row }) === "M"

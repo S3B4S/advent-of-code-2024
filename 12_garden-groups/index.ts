@@ -56,7 +56,12 @@ export const scanRegionPerimeter = (region: HashSet<Coordinate>) => {
     let count = 4;
 
     board
-      .neighbours(coord, [Direction.N, Direction.E, Direction.S, Direction.W])
+      .getNeighbours(coord, [
+        Direction.N,
+        Direction.E,
+        Direction.S,
+        Direction.W,
+      ])
       .forEach((neighbor) => {
         if (board.getCell(neighbor) === "X") {
           count--;
@@ -118,7 +123,7 @@ const floodFill = (
     region.include(current);
     visited.include(current);
 
-    const neighbors = board.neighbours(current, [
+    const neighbors = board.getNeighbours(current, [
       Direction.N,
       Direction.E,
       Direction.S,
@@ -199,7 +204,7 @@ export const scanRegionSides = (
 
   board.iterateOver(Spaces.WALL, (coord) => {
     let directionIndex = 0;
-    board.neighbours(coord, directions).forEach((neighbor) => {
+    board.getNeighbours(coord, directions).forEach((neighbor) => {
       if (board.getCell(neighbor) !== Spaces.WALL) {
         if (
           directions[directionIndex] === Direction.E ||
