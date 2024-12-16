@@ -34,9 +34,8 @@ testWrapper("Day 16", () => {
     expect(solvePart1(exampleInput)).toEqual(7036);
   });
 
-  // 113432 answer too high
   Deno.test("Part 1 - File input", () => {
-    expect(solvePart1(fileInput)).toEqual(0);
+    expect(solvePart1(fileInput)).toEqual(102460);
   });
 
   Deno.test.ignore("Part 2 - Example input", () => {

@@ -70,3 +70,7 @@ export const detectAmountOfGaps = (list: number[]) => {
 
   return gaps;
 };
+
+export const zip = <A, B>(a: A[], b: B[]) => {
+  return a.map((_, i) => [a[i], b[i]]);
+};

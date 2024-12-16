@@ -306,10 +306,23 @@ export const destringifyCoord = (coord: string) => {
   return { col: Number(col), row: Number(row) };
 };
 
+export const destringifyCoordDirection = (coord: string) => {
+  const [col, row, direction] = coord.split(",");
+  return {
+    col: Number(col),
+    row: Number(row),
+    direction: direction as Direction,
+  };
+};
+
 export const stringifyCoordDirection = (
   coord: Coordinate,
   direction: Direction
 ) => String(coord.col) + "," + String(coord.row) + "," + String(direction);
+
+export const turn180Degrees = (direction: Direction): Direction => {
+  return turn90DegreesClockWise(turn90DegreesClockWise(direction));
+};
 
 export const turn90DegreesClockWise = (direction: Direction): Direction => {
   return (

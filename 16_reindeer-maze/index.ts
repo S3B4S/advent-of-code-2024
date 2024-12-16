@@ -1,8 +1,16 @@
-import { Coordinate } from "../utils/board.ts";
+import {
+  Coordinate,
+  stringifyCoordDirection,
+  turn180Degrees,
+  turn90DegreesClockWise,
+  turn90DegreesCounterClockwise,
+  destringifyCoordDirection,
+} from "../utils/board.ts";
 import { equalCoordinates } from "../utils/board.ts";
 import { stringifyCoord } from "../utils/board.ts";
 import { Board, Direction } from "../utils/board.ts";
 import { HashSet } from "../utils/hashSet.ts";
+import { zip } from "../utils/list.ts";
 
 export const solvePart1 = (input: string) => {
   const board = Board.fromUnparsedBoard(input);
@@ -10,32 +18,130 @@ export const solvePart1 = (input: string) => {
   const start = board.getPositionsByKey("S")[0];
   const end = board.getPositionsByKey("E")[0];
 
-  // console.log(start, end);
+  const graph = constructDirectedWeightedGraph(board, start);
+  const result = dijkstra(graph, start, end);
 
-  const paths = findPaths(board, start, end);
-  // console.log(paths);
+  return result;
+};
 
-  if (paths.length === 0) return 0;
+const plusDirections = [Direction.N, Direction.E, Direction.S, Direction.W];
 
-  // for (const coord of path) {
-  //   board.setCell("O", coord);
-  // }
+const dijkstra = (
+  graph: Record<string, Record<string, number>>,
+  start: Coordinate,
+  end: Coordinate
+) => {
+  const queue = [] as { coord: Coordinate; dir: Direction }[];
+  queue.push({ coord: start, dir: Direction.E });
 
-  // console.log(board.toString());
+  const mem = {} as Record<string, { cost: number; lastNode: string }>;
 
-  // Calculate if we need to turn at the beginning
-  // const isDirectionFirstStepEast =
-  //   path[0].row === path[1].row && path[0].col < path[1].col ? 1 : 0;
+  mem[stringifyCoordDirection(start, Direction.E)] = {
+    cost: 0,
+    lastNode: stringifyCoordDirection(start, Direction.E),
+  };
 
-  let lowest = Infinity;
+  while (queue.length > 0) {
+    const currentNode = queue.shift()!;
+    const currentNodeKey = stringifyCoordDirection(
+      currentNode.coord,
+      currentNode.dir
+    );
 
-  for (const path of paths) {
-    const { step, turn } = calculatePath(path);
-    const score = step * 1 + (1 + turn) * 1000;
-    lowest = Math.min(lowest, score);
+    for (const [neighbour, cost] of Object.entries(graph[currentNodeKey])) {
+      mem[neighbour] = {
+        cost: mem[neighbour]?.cost || Infinity,
+        lastNode: mem[neighbour]?.lastNode || currentNodeKey,
+      };
+
+      const newCost = mem[currentNodeKey].cost + cost;
+      if (newCost < mem[neighbour].cost) {
+        mem[neighbour].cost = newCost;
+        mem[neighbour].lastNode = currentNodeKey;
+
+        const { col, row, direction } = destringifyCoordDirection(neighbour);
+        queue.push({
+          coord: { col, row },
+          dir: direction,
+        });
+      }
+    }
   }
 
-  return lowest;
+  const res = plusDirections.reduce((acc, dir) => {
+    return Math.min(
+      acc,
+      mem[stringifyCoordDirection(end, dir)]?.cost || Infinity
+    );
+  }, Infinity);
+
+  return res;
+};
+
+/**
+ * Every empty space gets turned into a maximum of 4 nodes, each indicating a different incoming direction
+ * @param board
+ */
+const constructDirectedWeightedGraph = (
+  board: Board<string, number>,
+  start: Coordinate
+) => {
+  const graph = {} as Record<string, Record<string, number>>;
+  graph[stringifyCoordDirection(start, Direction.E)] = {};
+
+  const queue: { coord: Coordinate; dir: Direction }[] = [];
+  queue.push({ coord: start, dir: Direction.E });
+
+  const visited = new HashSet<{ coord: Coordinate; dir: Direction }>(
+    ({ coord, dir }) => stringifyCoordDirection(coord, dir)
+  );
+
+  while (queue.length > 0) {
+    const currentNode = queue.shift()!;
+    visited.include(currentNode);
+
+    for (const [neighbourDir, neighbor] of zip(
+      plusDirections,
+      board.getNeighbours(currentNode.coord, plusDirections)
+    ) as [Direction, Coordinate][]) {
+      if (
+        board.safeGetCell(neighbor) !== "." &&
+        board.safeGetCell(neighbor) !== "E" &&
+        board.safeGetCell(neighbor) !== "S"
+      )
+        continue;
+
+      // If the neighbour is in opposite direction, we are not interested in this route
+      if (neighbourDir === turn180Degrees(currentNode.dir)) {
+        continue;
+      }
+
+      const currentNodeKey = stringifyCoordDirection(
+        currentNode.coord,
+        currentNode.dir
+      );
+      const neighborKey = stringifyCoordDirection(neighbor, neighbourDir);
+
+      if (!graph[neighborKey]) {
+        graph[neighborKey] = {} as Record<string, number>;
+      }
+
+      let cost = 1;
+      if (
+        neighbourDir === turn90DegreesClockWise(currentNode.dir) ||
+        neighbourDir === turn90DegreesCounterClockwise(currentNode.dir)
+      ) {
+        cost += 1000;
+      }
+
+      graph[currentNodeKey][neighborKey] = cost;
+      if (!visited.contains({ coord: neighbor, dir: neighbourDir })) {
+        queue.push({ coord: neighbor, dir: neighbourDir });
+      }
+    }
+  }
+
+  return graph;
 };
 
 const findPaths = (
@@ -43,39 +149,56 @@ const findPaths = (
   start: Coordinate,
   end: Coordinate
 ) => {
-  // List of paths
-  const queue: { path: Coordinate[]; visited: HashSet<Coordinate> }[] = [];
-  queue.push({
-    path: [start],
-    visited: new HashSet<Coordinate>(stringifyCoord),
-  });
+  const queue: Coordinate[] = [];
+  queue.push(start);
 
+  const mem = {} as Record<
+    string,
+    {
+      known: boolean;
+      cost: number;
+      lastNode: Coordinate;
+    }
+  >;
+
+  mem[stringifyCoord(start)] = {
+    known: false,
+    cost: 0,
+    lastNode: start,
+  };
   // const visited = new HashSet<Coordinate>(stringifyCoord);
   // visited.include(start);
 
   const finalPaths: Coordinate[][] = [];
 
   while (queue.length > 0) {
-    const currentPath = queue.shift()!;
-    const log = (msg: unknown) => {
-      if (currentPath.path.find((c) => c.col === 10 && c.row === 7)) {
-        console.log("cond log:", msg);
-      }
+    const currentNode = queue.shift()!;
+
+    mem[stringifyCoord(currentNode)] = {
+      known: true,
+      cost: mem[stringifyCoord(currentNode)].cost + 1,
+      lastNode: currentNode,
     };
-    const lastNode = currentPath.path[currentPath.path.length - 1];
+
+    // const log = (msg: unknown) => {
+    //   if (currentPath.path.find((c) => c.col === 10 && c.row === 7)) {
+    //     console.log("cond log:", msg);
+    //   }
+    // };
+    // const lastNode = currentPath.path[currentPath.path.length - 1];
 
     // log(currentPath);
     // log(lastNode);
 
-    if (equalCoordinates(lastNode, end)) {
-      // log("pushing to final !!!!!");
-      // log(finalPaths);
-      finalPaths.push(currentPath.path);
-      continue;
-      // return currentPath;
-    }
+    // if (equalCoordinates(currentNode, end)) {
+    // log("pushing to final !!!!!");
+    // log(finalPaths);
+    // finalPaths.push(currentPath.path);
+    // continue;
+    // return currentPath;
+    // }
 
-    for (const neighbor of board.getNeighbours(lastNode, [
+    for (const neighbor of board.getNeighbours(currentNode, [
       Direction.N,
       Direction.E,
       Direction.S,
@@ -87,25 +210,22 @@ const findPaths = (
       )
         continue;
 
-      console.log(currentPath.path);
-      if (!currentPath.visited.contains(neighbor)) {
-        // if (lastNode.col === 9 && lastNode.row === 7) {
-        // console.log("9,7 nb:", neighbor);
-        // }
+      console.log(currentNode);
+      // if (!currentNode.contains(neighbor)) {
+      // if (lastNode.col === 9 && lastNode.row === 7) {
+      // console.log("9,7 nb:", neighbor);
+      // }
 
-        // Do not add the end coordinate to visited
-        // Might want to keep track of visited per path
-        // if (!equalCoordinates(neighbor, end))
-        // currentPath.visited.include(neighbor);
+      // Do not add the end coordinate to visited
+      // Might want to keep track of visited per path
+      // if (!equalCoordinates(neighbor, end))
+      // currentPath.visited.include(neighbor);
 
-        queue.push({
-          path: [...currentPath.path, neighbor],
-          visited: currentPath.visited,
-        });
-        // if (lastNode.col === 9 && lastNode.row === 7) {
-        // console.log("9,7 queue:", queue);
-        // }
-      }
+      queue.push(neighbor);
+      // if (lastNode.col === 9 && lastNode.row === 7) {
+      // console.log("9,7 queue:", queue);
+      // }
+      // }
     }
   }
 
