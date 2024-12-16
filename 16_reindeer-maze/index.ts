@@ -44,22 +44,25 @@ const findPaths = (
   end: Coordinate
 ) => {
   // List of paths
-  const queue: Coordinate[][] = [];
-  queue.push([start]);
+  const queue: { path: Coordinate[]; visited: HashSet<Coordinate> }[] = [];
+  queue.push({
+    path: [start],
+    visited: new HashSet<Coordinate>(stringifyCoord),
+  });
 
-  const visited = new HashSet<Coordinate>(stringifyCoord);
-  visited.include(start);
+  // const visited = new HashSet<Coordinate>(stringifyCoord);
+  // visited.include(start);
 
   const finalPaths: Coordinate[][] = [];
 
   while (queue.length > 0) {
     const currentPath = queue.shift()!;
     const log = (msg: unknown) => {
-      if (currentPath.find((c) => c.col === 10 && c.row === 7)) {
+      if (currentPath.path.find((c) => c.col === 10 && c.row === 7)) {
         console.log("cond log:", msg);
       }
     };
-    const lastNode = currentPath[currentPath.length - 1];
+    const lastNode = currentPath.path[currentPath.path.length - 1];
 
     // log(currentPath);
     // log(lastNode);
@@ -67,7 +70,7 @@ const findPaths = (
     if (equalCoordinates(lastNode, end)) {
       // log("pushing to final !!!!!");
       // log(finalPaths);
-      finalPaths.push(currentPath);
+      finalPaths.push(currentPath.path);
       continue;
       // return currentPath;
     }
@@ -83,18 +86,25 @@ const findPaths = (
         board.safeGetCell(neighbor) !== "E"
       )
         continue;
-      if (!visited.contains(neighbor)) {
+
+      console.log(currentPath.path);
+      if (!currentPath.visited.contains(neighbor)) {
         // if (lastNode.col === 9 && lastNode.row === 7) {
         // console.log("9,7 nb:", neighbor);
-        // }
-        queue.push([...currentPath, neighbor]);
-        // if (lastNode.col === 9 && lastNode.row === 7) {
-        // console.log("9,7 queue:", queue);
         // }
 
         // Do not add the end coordinate to visited
         // Might want to keep track of visited per path
-        if (!equalCoordinates(neighbor, end)) visited.include(neighbor);
+        // if (!equalCoordinates(neighbor, end))
+        // currentPath.visited.include(neighbor);
+
+        queue.push({
+          path: [...currentPath.path, neighbor],
+          visited: currentPath.visited,
+        });
+        // if (lastNode.col === 9 && lastNode.row === 7) {
+        // console.log("9,7 queue:", queue);
+        // }
       }
     }
   }
