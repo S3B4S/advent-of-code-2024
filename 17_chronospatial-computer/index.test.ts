@@ -228,9 +228,8 @@ testWrapper("Day 17", () => {
     expect(solvePart1(input).registers.B).toEqual(44354);
   });
 
-  // 404712716 not the right answer
   Deno.test("Part 1 - File input", () => {
-    expect(solvePart1(fileInput).outcome).toEqual("");
+    expect(solvePart1(fileInput).outcome).toEqual("4,0,4,7,1,2,7,1,6");
   });
 
   Deno.test.ignore("Part 2 - Example input", () => {

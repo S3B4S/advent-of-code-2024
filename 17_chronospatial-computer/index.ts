@@ -153,10 +153,10 @@ export const solvePart1 = (input: string) => {
       registers
     );
 
-    // console.log("---- new loop! ----");
-    // console.log("[instruction]", instruction, "[operand]", operand);
-    // console.log("[programExecuted]", programExecuted, "[outcome]", outcome);
-    // console.log("registers", registers);
+    console.log("---- new loop! ----");
+    console.log("[instruction]", instruction, "[operand]", operand);
+    console.log("[programExecuted]", programExecuted, "[outcome]", outcome);
+    console.log("registers", registers);
 
     if (programExecuted === "out") {
       outcomeStream += String(outcome) + ",";
