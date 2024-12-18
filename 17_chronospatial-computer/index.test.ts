@@ -232,11 +232,23 @@ testWrapper("Day 17", () => {
     expect(solvePart1(fileInput).outcome).toEqual("4,0,4,7,1,2,7,1,6");
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input", () => {
+    expect(
+      solvePart2(
+        `
+      Register A: 2024
+      Register B: 0
+      Register C: 0
+
+      Program: 0,3,5,4,3,0
+`
+          .replaceAll(/^ +/gm, "")
+          .trim()
+      ).i
+    ).toEqual(117440);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
+  Deno.test.only("Part 2 - File input", () => {
     expect(solvePart2(fileInput)).toEqual(0);
   });
 });
