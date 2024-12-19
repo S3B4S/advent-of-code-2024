@@ -1,5 +1,47 @@
 import { BijectiveMap } from "./bijectiveMap.ts";
 
+export const Characters = {
+  /**
+   * █
+   */
+  WhiteRetroBlock: "█",
+
+  /**
+   *
+   */
+  Space: " ",
+
+  /**
+   * .
+   */
+  Dot: ".",
+
+  /**
+   * #
+   */
+  HashTag: "#",
+
+  /**
+   * ~
+   */
+  Tilde: "~",
+
+  /**
+   * \*
+   */
+  Star: "*",
+
+  /**
+   * \+
+   */
+  Plus: "+",
+
+  /**
+   * @
+   */
+  At: "@",
+};
+
 // prettier-ignore
 export enum Direction {
   NW  = "NW", // ↖️
@@ -55,6 +97,13 @@ export const relativeCoords: Record<Direction, Coordinate> = {
 };
 
 export const relativeCoordsList = Object.values(relativeCoords);
+
+export const dpadDirections = [
+  Direction.N,
+  Direction.E,
+  Direction.S,
+  Direction.W,
+];
 
 export const addCoordinates = (coordA: Coordinate, coordB: Coordinate) => {
   return {
