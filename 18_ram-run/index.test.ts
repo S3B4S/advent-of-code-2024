@@ -48,11 +48,22 @@ testWrapper("Day 18", () => {
     expect(solvePart1(fileInput)).toEqual(288);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input - reachable", () => {
+    expect(solvePart1(exampleInput, { width: 7, height: 7 }, 20)).toEqual(24);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - Example input - unreachable", () => {
+    expect(solvePart1(exampleInput, { width: 7, height: 7 }, 21)).toEqual(-1);
+  });
+
+  Deno.test("Part 2 - Example input - Find blocking byte", () => {
+    expect(solvePart2(exampleInput, { width: 7, height: 7 })).toStrictEqual({
+      col: 6,
+      row: 1,
+    });
+  });
+
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toStrictEqual({ col: 52, row: 5 });
   });
 });

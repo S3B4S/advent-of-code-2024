@@ -69,6 +69,11 @@ export const solvePart1 = (
     }
   }
 
+  if (!mem.get(end)) {
+    console.error("Exit is unreachable!");
+    return -1;
+  }
+
   // Trace back path
   let count = 0;
 
@@ -89,6 +94,26 @@ const heuristic = (end: Coordinate, current: Coordinate) => {
   return Math.abs(end.col - current.col) + Math.abs(end.row - current.row);
 };
 
-export const solvePart2 = (input: string) => {
-  return 0;
+/**
+ * @TODO Should do binary search
+ */
+export const solvePart2 = (
+  input: string,
+  memorySpace: { width: number; height: number } = { width: 71, height: 71 }
+) => {
+  const nBytes = input.trim().split("\n").length;
+  const bytes = input
+    .trim()
+    .split("\n")
+    .map((line) => line.split(",").map((x) => Number(x)));
+
+  for (let i = 0; i < nBytes; i++) {
+    const result = solvePart1(input, memorySpace, i);
+    if (result === -1) {
+      const byte = bytes[i - 1];
+      return { col: byte[0], row: byte[1] };
+    }
+  }
+
+  return { col: -1, row: -1 };
 };
