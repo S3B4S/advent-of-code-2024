@@ -29,7 +29,7 @@ testWrapper("Day 19", () => {
     expect(solvePart1(exampleInput)).toEqual(6);
   });
 
-  Deno.test.ignore("[DEBUG] Part 1 - Example input", () => {
+  Deno.test("Part 1 - Example input - bwurrg", () => {
     expect(
       solvePart1(
         `
@@ -47,11 +47,53 @@ testWrapper("Day 19", () => {
     expect(solvePart1(fileInput)).toEqual(296);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input - brwrr", () => {
+    expect(
+      solvePart2(
+        `
+        r, wr, b, g, bwu, rb, gb, br
+
+        brwrr
+        `
+          .replaceAll(/^ +/gm, "")
+          .trim()
+      )
+    ).toEqual(2);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - Example input - gbbr", () => {
+    expect(
+      solvePart2(
+        `
+        r, wr, b, g, bwu, rb, gb, br
+
+        gbbr
+        `
+          .replaceAll(/^ +/gm, "")
+          .trim()
+      )
+    ).toEqual(4);
+  });
+
+  Deno.test("Part 2 - Example input - rrbgbr", () => {
+    expect(
+      solvePart2(
+        `
+        r, wr, b, g, bwu, rb, gb, br
+
+        rrbgbr
+        `
+          .replaceAll(/^ +/gm, "")
+          .trim()
+      )
+    ).toEqual(6);
+  });
+
+  Deno.test("Part 2 - Example input", () => {
+    expect(solvePart2(exampleInput)).toEqual(16);
+  });
+
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(619970556776002);
   });
 });
