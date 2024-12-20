@@ -17,7 +17,7 @@ export const Characters = {
   Dot: ".",
 
   /**
-   * #
+   * \#
    */
   HashTag: "#",
 
@@ -347,7 +347,8 @@ export class Board<K extends PropertyKey, V extends number> {
   }
 }
 
-export const stringifyCoord = (coord: Coordinate) =>
+export type StringifiedCoord = string;
+export const stringifyCoord = (coord: Coordinate): StringifiedCoord =>
   String(coord.col) + "," + String(coord.row);
 
 export const destringifyCoord = (coord: string) => {
