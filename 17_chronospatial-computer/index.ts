@@ -173,7 +173,47 @@ export const solvePart1 = (input: string) => {
   };
 };
 
+// Cache of A -> outcome values
+let mem = {} as Record<string, string>;
+
+// Cache of outcome values -> A
+let memReversed = {} as Record<string, string>;
+
+const reverseEngineerTree = (
+  program: Opcode[],
+  path: string = "",
+  depth: number = 0
+): string[] | undefined => {
+  if (program.length === 0) {
+    return [path];
+  }
+
+  let possibilities = [] as string[];
+
+  for (let nCharacters = 1; nCharacters <= 6; nCharacters++) {
+    const substring = program.slice(0, nCharacters).toReversed().join(",");
+    if (memReversed[substring]) {
+      possibilities = possibilities.concat(
+        reverseEngineerTree(
+          program.slice(nCharacters),
+          memReversed[substring] + "," + path,
+          depth + 1
+        ) || []
+      );
+    }
+  }
+
+  // if (depth === 0) console.log("possibilities", possibilities);
+  if (possibilities.length === 0) {
+    return undefined;
+  }
+
+  return possibilities;
+};
+
 export const solvePart2 = (input: string) => {
+  mem = {};
+
   const registerValues = [
     ...input.trim().matchAll(/^Register [ABC]: (\d+)$/gm),
   ].map((m) => Number(m[1]));
@@ -189,17 +229,11 @@ export const solvePart2 = (input: string) => {
 
   const expectedOutcome = program.join(",");
 
-  let outputSeq = "";
+  // Just for simpleness sake, fill the memory cache with all combinations up to 2 ** 10
+  // The A input can matter up to the 9th bit position (9th included), which is the 2 ** 9 (=== 8 ** 3), we want to calculate all possibiles in that range as well, so up to 2 ** 10
 
-  const seqIds = {} as Record<string, number>;
-
-  // Cache of A -> outcome values
-  const mem = {} as Record<string, string>;
-
-  // prettier-ignore
-  const start = 8 ** 15;
-  const end = 8 ** 16;
-
+  const start = 0;
+  const end = 8 ** 6;
   const step = 1;
 
   // When the first negative numbers started popping up
@@ -229,17 +263,11 @@ export const solvePart2 = (input: string) => {
       const instruction = program[instructionPointer];
       const operand = program[instructionPointer + 1];
 
-      // debugStream += `${registers.A},${registers.B},${registers.C} -> `;
-      // debugStream += `${instruction},${operand} -> `;
       const { outcome, programExecuted } = instructions(
         instruction,
         operand,
         registers
       );
-
-      // debugStream += `${programExecuted} -> `;
-      // debugStream +=
-      //   Object.values(registers).map((v) => dec2bin(Number(v))) + "\n";
 
       if (programExecuted === "out") {
         outcomeStream += String(outcome) + ",";
@@ -254,26 +282,9 @@ export const solvePart2 = (input: string) => {
       instructionPointer += 2;
     }
 
-    // console.log("cache set");
     mem[currentA.toString()] = outcomeStream;
+    memReversed[outcomeStream.slice(0, -1)] = currentA.toString();
     debugStream += `Outcome: ${outcomeStream.slice(0, -1)}\n`;
-    // console.log(mem);
-
-    // DEBUGGING
-    // if (i === start + step * 100) {
-    //   Deno.writeFileSync(
-    //     "count3.json",
-    //     new TextEncoder().encode(JSON.stringify(seqIds))
-    //   );
-    //   Deno.writeFileSync("sequences3.txt", new TextEncoder().encode(outputSeq));
-    // }
-
-    // if (i < start + step * 100) {
-    //   seqIds[outcomeStream.slice(0, -1)] =
-    //     (seqIds[outcomeStream.slice(0, -1)] ?? 0) + 1;
-
-    //   outputSeq += i + ": " + outcomeStream.slice(0, -1) + "\n";
-    // }
 
     if (outcomeStream.slice(0, -1) === expectedOutcome) {
       return {
@@ -284,10 +295,71 @@ export const solvePart2 = (input: string) => {
     }
   }
 
-  Deno.writeFileSync(
-    "./17_chronospatial-computer/~debug.txt",
-    new TextEncoder().encode(debugStream)
-  );
+  const programReversed = program.toReversed();
+  const res = reverseEngineerTree(programReversed);
+
+  if (!res) return { registers, i: -1, outcome: "" };
+
+  for (const x of res) {
+    const A = parseInt(
+      x
+        .slice(0, -1)
+        .split(",")
+        .map((n) => dec2bin(Number(n)))
+        .join(""),
+      2
+    );
+
+    registers.A = BigInt(A);
+    registers.B = 0n;
+    registers.C = 0n;
+
+    let instructionPointer = 0;
+    let outcomeStream = "";
+
+    while (instructionPointer < program.length) {
+      if (instructionPointer === 0 && mem[registers.A.toString()]) {
+        outcomeStream += mem[registers.A.toString()]!;
+        break;
+      }
+
+      const instruction = program[instructionPointer];
+      const operand = program[instructionPointer + 1];
+
+      const { outcome, programExecuted } = instructions(
+        instruction,
+        operand,
+        registers
+      );
+
+      if (programExecuted === "out") {
+        outcomeStream += String(outcome) + ",";
+      }
+
+      if (programExecuted === "jnz") {
+        // In the case of an jnz, we know that the outcome is the indeex to jump to
+        instructionPointer = outcome!;
+        continue;
+      }
+
+      instructionPointer += 2;
+    }
+
+    if (outcomeStream.slice(0, -1) === expectedOutcome) {
+      return {
+        registers,
+        i: -1,
+        outcome: outcomeStream.slice(0, -1),
+      };
+    }
+  }
+
+  // console.log(mem);
+
+  // Deno.writeFileSync(
+  //   "./17_chronospatial-computer/~debug.txt",
+  //   new TextEncoder().encode(debugStream)
+  // );
 
   // for (const [key, value] of Object.entries(mem)) {
   //   console.log(
