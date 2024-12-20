@@ -126,21 +126,13 @@ const instructions = (
   };
 };
 
-export const solvePart1 = (input: string) => {
-  const registerValues = [
-    ...input.trim().matchAll(/^Register [ABC]: (\d+)$/gm),
-  ].map((m) => BigInt(m[1]));
-
-  const program = [...input.trim().matchAll(/^Program: ((?:\d,)+\d)$/gm)][0][1]
-    .split(",")
-    .map((n) => Number(n)) as Opcode[];
-
-  const registers = {
-    A: registerValues[0],
-    B: registerValues[1],
-    C: registerValues[2],
-  };
-
+/**
+ * Runs the program and returns the outcome, mutates the registers
+ * @param program The program to run
+ * @param registers The registers to use
+ * @returns The outcome of the program
+ */
+const runProgram = (program: Opcode[], registers: Registers) => {
   let instructionPointer = 0;
   let outcomeStream = "";
 
@@ -171,6 +163,24 @@ export const solvePart1 = (input: string) => {
     registers,
     outcome: outcomeStream.slice(0, -1),
   };
+};
+
+export const solvePart1 = (input: string) => {
+  const registerValues = [
+    ...input.trim().matchAll(/^Register [ABC]: (\d+)$/gm),
+  ].map((m) => BigInt(m[1]));
+
+  const program = [...input.trim().matchAll(/^Program: ((?:\d,)+\d)$/gm)][0][1]
+    .split(",")
+    .map((n) => Number(n)) as Opcode[];
+
+  const registers = {
+    A: registerValues[0],
+    B: registerValues[1],
+    C: registerValues[2],
+  };
+
+  return runProgram(program, registers);
 };
 
 // Cache of A -> outcome values
