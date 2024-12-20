@@ -130,6 +130,7 @@ export const solvePart1 = (input: string) => {
   const registerValues = [
     ...input.trim().matchAll(/^Register [ABC]: (\d+)$/gm),
   ].map((m) => BigInt(m[1]));
+
   const program = [...input.trim().matchAll(/^Program: ((?:\d,)+\d)$/gm)][0][1]
     .split(",")
     .map((n) => Number(n)) as Opcode[];
@@ -191,37 +192,54 @@ export const solvePart2 = (input: string) => {
   let outputSeq = "";
 
   const seqIds = {} as Record<string, number>;
-  const mem = {} as Record<number, string>;
+
+  // Cache of A -> outcome values
+  const mem = {} as Record<string, string>;
 
   // prettier-ignore
-  // const duration =   1000000000;
-  // const start =  35100000000000;
-  const start =  35101810704243;
-  // prettier-ignore
-  const end =   281475000000000;
-  // prettier-ignore
-  // 35101810704243
-  const step =         1000;
-  // const step =         10000000;
+  const start = 8 ** 15;
+  const end = 8 ** 16;
+
+  const step = 1;
 
   // When the first negative numbers started popping up
   // const start = 2147514097;
   // const duration = 1;
 
+  let debugStream = "";
+
   for (let i = start; i <= end; i += step) {
-    registers.A = BigInt(i);
+    const currentA = i;
+    registers.A = BigInt(currentA);
+    registers.B = 0n;
+    registers.C = 0n;
+
     let instructionPointer = 0;
     let outcomeStream = "";
 
+    debugStream += `\n${currentA}, ${dec2bin(currentA)}: \n`;
+
     while (instructionPointer < program.length) {
+      if (instructionPointer === 0 && mem[registers.A.toString()]) {
+        outcomeStream += mem[registers.A.toString()]!;
+        debugStream += `Outcome: ${outcomeStream.slice(0, -1)}\n`;
+        break;
+      }
+
       const instruction = program[instructionPointer];
       const operand = program[instructionPointer + 1];
 
+      // debugStream += `${registers.A},${registers.B},${registers.C} -> `;
+      // debugStream += `${instruction},${operand} -> `;
       const { outcome, programExecuted } = instructions(
         instruction,
         operand,
         registers
       );
+
+      // debugStream += `${programExecuted} -> `;
+      // debugStream +=
+      //   Object.values(registers).map((v) => dec2bin(Number(v))) + "\n";
 
       if (programExecuted === "out") {
         outcomeStream += String(outcome) + ",";
@@ -236,25 +254,28 @@ export const solvePart2 = (input: string) => {
       instructionPointer += 2;
     }
 
+    // console.log("cache set");
+    mem[currentA.toString()] = outcomeStream;
+    debugStream += `Outcome: ${outcomeStream.slice(0, -1)}\n`;
+    // console.log(mem);
+
     // DEBUGGING
-    if (i === start + step * 100) {
-      Deno.writeFileSync(
-        "count3.json",
-        new TextEncoder().encode(JSON.stringify(seqIds))
-      );
-      Deno.writeFileSync("sequences3.txt", new TextEncoder().encode(outputSeq));
-    }
+    // if (i === start + step * 100) {
+    //   Deno.writeFileSync(
+    //     "count3.json",
+    //     new TextEncoder().encode(JSON.stringify(seqIds))
+    //   );
+    //   Deno.writeFileSync("sequences3.txt", new TextEncoder().encode(outputSeq));
+    // }
 
-    if (i < start + step * 100) {
-      seqIds[outcomeStream.slice(0, -1)] =
-        (seqIds[outcomeStream.slice(0, -1)] ?? 0) + 1;
+    // if (i < start + step * 100) {
+    //   seqIds[outcomeStream.slice(0, -1)] =
+    //     (seqIds[outcomeStream.slice(0, -1)] ?? 0) + 1;
 
-      outputSeq += i + ": " + outcomeStream.slice(0, -1) + "\n";
-    }
+    //   outputSeq += i + ": " + outcomeStream.slice(0, -1) + "\n";
+    // }
 
-    if (
-      outcomeStream.slice(0, -1).slice(0, -5) === expectedOutcome.slice(0, -5)
-    ) {
+    if (outcomeStream.slice(0, -1) === expectedOutcome) {
       return {
         registers,
         i,
@@ -263,9 +284,26 @@ export const solvePart2 = (input: string) => {
     }
   }
 
+  Deno.writeFileSync(
+    "./17_chronospatial-computer/~debug.txt",
+    new TextEncoder().encode(debugStream)
+  );
+
+  // for (const [key, value] of Object.entries(mem)) {
+  //   console.log(
+  //     key.padStart(10),
+  //     dec2bin(Number(key)).padStart(20),
+  //     value.slice(0, -1).padStart(10)
+  //   );
+  // }
+
   return {
     registers,
     i: -1,
     outcome: "",
   };
+};
+
+const dec2bin = (dec: number) => {
+  return (dec >>> 0).toString(2);
 };

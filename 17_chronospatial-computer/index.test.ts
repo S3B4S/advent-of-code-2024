@@ -39,9 +39,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 800,
-      B: 0,
-      C: 0,
+      A: BigInt(800),
+      B: BigInt(0),
+      C: BigInt(0),
     });
   });
 
@@ -57,9 +57,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 0,
-      B: 782,
-      C: 0,
+      A: BigInt(0),
+      B: BigInt(782),
+      C: BigInt(0),
     });
   });
 
@@ -75,9 +75,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 0,
-      B: 1,
-      C: 9,
+      A: BigInt(0),
+      B: BigInt(1),
+      C: BigInt(9),
     });
   });
 
@@ -93,9 +93,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 0,
-      B: 0,
-      C: 9,
+      A: BigInt(0),
+      B: BigInt(0),
+      C: BigInt(9),
     });
   });
 
@@ -111,9 +111,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 1,
-      B: 98,
-      C: 0,
+      A: BigInt(1),
+      B: BigInt(98),
+      C: BigInt(0),
     });
   });
 
@@ -129,9 +129,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 0,
-      B: 222,
-      C: 911,
+      A: BigInt(0),
+      B: BigInt(222),
+      C: BigInt(911),
     });
   });
 
@@ -147,9 +147,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 800,
-      B: 800,
-      C: 0,
+      A: BigInt(800),
+      B: BigInt(800),
+      C: BigInt(0),
     });
   });
 
@@ -165,9 +165,9 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).registers).toStrictEqual({
-      A: 800,
-      B: 0,
-      C: 800,
+      A: BigInt(800),
+      B: BigInt(0),
+      C: BigInt(800),
     });
   });
 
@@ -197,7 +197,7 @@ testWrapper("Day 17", () => {
       .trim();
 
     expect(solvePart1(input).outcome).toEqual("4,2,5,6,7,7,7,7,3,1,0");
-    expect(solvePart1(input).registers.A).toEqual(0);
+    expect(solvePart1(input).registers.A).toEqual(BigInt(0));
   });
 
   Deno.test("Part 1 - Test program 3", () => {
@@ -211,7 +211,7 @@ testWrapper("Day 17", () => {
       .replaceAll(/^ +/gm, "")
       .trim();
 
-    expect(solvePart1(input).registers.B).toEqual(26);
+    expect(solvePart1(input).registers.B).toEqual(BigInt(26));
   });
 
   Deno.test("Part 1 - Test program 4", () => {
@@ -225,7 +225,7 @@ testWrapper("Day 17", () => {
       .replaceAll(/^ +/gm, "")
       .trim();
 
-    expect(solvePart1(input).registers.B).toEqual(44354);
+    expect(solvePart1(input).registers.B).toEqual(BigInt(44354));
   });
 
   Deno.test("Part 1 - File input", () => {
