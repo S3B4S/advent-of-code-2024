@@ -71,11 +71,11 @@ testWrapper("Day 20", () => {
     expect(solvePart1(fileInput).saveAtLeast100).toEqual(1389);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  Deno.test("Part 2 - Example input", () => {
+    expect(solvePart2(exampleInput).saveAtLeast50).toEqual(285);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput).saveAtLeast100).toEqual(1005068);
   });
 });

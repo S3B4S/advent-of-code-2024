@@ -223,6 +223,49 @@ export class Board<K extends PropertyKey, V extends number> {
   }
 
   /**
+   * v2 since I don't want to break the existing API
+   *
+   * Tiles reachable with given distance from the start.
+   * Steps are only north, south, west & east, diagonals are not allowed.
+   *
+   * @TODO skipping the elements that are out of bounds is not optimal, but it's a start
+   *
+   * @param coord
+   * @param distance
+   * @returns
+   */
+  getNeighboursv2(coord: Coordinate, distance: number = 1) {
+    const neighbours = [];
+
+    for (let offset = 0; offset <= distance; offset++) {
+      // Calculate the cols in the positive direction
+      for (
+        let y = coord.row - (distance - offset);
+        y <= coord.row + (distance - offset);
+        y++
+      ) {
+        if (this.isWithinBounds({ col: coord.col + offset, row: y }))
+          neighbours.push({ col: coord.col + offset, row: y });
+      }
+
+      // Skip calcluating the negative direction if the offset is 0 (would be equal)
+      if (offset === 0) continue;
+
+      // Calculate the cols in the negative direction
+      for (
+        let y = coord.row - (distance - offset);
+        y <= coord.row + (distance - offset);
+        y++
+      ) {
+        if (this.isWithinBounds({ col: coord.col - offset, row: y }))
+          neighbours.push({ col: coord.col - offset, row: y });
+      }
+    }
+
+    return neighbours;
+  }
+
+  /**
    * @TODO
    */
   getNeighbours(
@@ -443,4 +486,11 @@ export const directionArrows = {
   [Direction.E]: "➡️",
   [Direction.S]: "⬇️",
   [Direction.W]: "⬅️",
+};
+
+export const distanceBetweenCoords = (
+  coordA: Coordinate,
+  coordB: Coordinate
+) => {
+  return Math.abs(coordA.col - coordB.col) + Math.abs(coordA.row - coordB.row);
 };

@@ -5,14 +5,10 @@ import {
   dpadDirections,
   StringifiedCoord,
   stringifyCoord,
-  Direction,
-  addDirectionToCoordinate,
   destringifyCoord,
-  turn90DegreesClockWise,
-  turn90DegreesCounterClockwise,
+  distanceBetweenCoords,
 } from "../utils/board.ts";
 import { HashSet } from "../utils/hashSet.ts";
-import { zip } from "../utils/list.ts";
 
 const STEP_COST = 1;
 type Graph = Record<
@@ -25,9 +21,10 @@ type Graph = Record<
   }
 >;
 
-const constructGraph = (
+const constructGraphWithCheatingRoutes = (
   board: Board<StringifiedCoord, number>,
-  start: Coordinate
+  start: Coordinate,
+  cheatingRange: number = 2
 ) => {
   const graph = {} as Graph;
 
@@ -46,60 +43,15 @@ const constructGraph = (
     };
     visited.include(currentNode);
 
-    for (const [direction, neighbor] of zip(
-      dpadDirections,
-      board.getNeighbours(currentNode, dpadDirections)
-    ) as [Direction, Coordinate][]) {
-      // This is for cheat routes that go 2 in the same direction
-      if (
-        board.safeGetCell(neighbor) === Characters.HashTag &&
-        board.safeGetCell(addDirectionToCoordinate(neighbor, direction)) ===
-          Characters.Dot
-      ) {
+    for (const nb of board.getNeighboursv2(currentNode, cheatingRange)) {
+      if (board.getCell(nb) === Characters.Dot) {
         // This qualifies for a cheat route
-        graph[stringifyCoord(currentNode)].cheatRoutes[
-          stringifyCoord(addDirectionToCoordinate(neighbor, direction))
-        ] = 1;
+        graph[stringifyCoord(currentNode)].cheatRoutes[stringifyCoord(nb)] = 1;
       }
+    }
 
-      // This is for cheat routes that take a turn clockwise
-      if (
-        board.safeGetCell(neighbor) === Characters.HashTag &&
-        board.safeGetCell(
-          addDirectionToCoordinate(neighbor, turn90DegreesClockWise(direction))
-        ) === Characters.Dot
-      ) {
-        graph[stringifyCoord(currentNode)].cheatRoutes[
-          stringifyCoord(
-            addDirectionToCoordinate(
-              neighbor,
-              turn90DegreesClockWise(direction)
-            )
-          )
-        ] = 1;
-      }
-
-      // This is for cheat routes that take a turn clockwise
-      // if (
-      //   board.safeGetCell(neighbor) === Characters.HashTag &&
-      //   board.safeGetCell(
-      //     addDirectionToCoordinate(
-      //       neighbor,
-      //       turn90DegreesCounterClockwise(direction)
-      //     )
-      //   ) === Characters.Dot
-      // ) {
-      //   graph[stringifyCoord(currentNode)].cheatRoutes[
-      //     stringifyCoord(
-      //       addDirectionToCoordinate(
-      //         neighbor,
-      //         turn90DegreesCounterClockwise(direction)
-      //       )
-      //     )
-      //   ] = 1;
-      // }
-
-      if (board.safeGetCell(neighbor) !== ".") {
+    for (const neighbor of board.getNeighbours(currentNode, dpadDirections)) {
+      if (board.safeGetCell(neighbor) !== Characters.Dot) {
         continue;
       }
 
@@ -141,7 +93,10 @@ const calculateSavingsCheatingRoutes = (graph: Graph, start: Coordinate) => {
 
     for (const cheatNb of Object.keys(currentNode.cheatRoutes)) {
       const cheatNbNode = graph[cheatNb];
-      const savedCost = cheatNbNode.cost - currentNode.cost - 2;
+      const savedCost =
+        cheatNbNode.cost -
+        currentNode.cost -
+        distanceBetweenCoords(currentCoord, destringifyCoord(cheatNb));
 
       if (savedCost <= 0) {
         continue;
@@ -150,9 +105,6 @@ const calculateSavingsCheatingRoutes = (graph: Graph, start: Coordinate) => {
       if (savedCosts[savedCost] === undefined) {
         savedCosts[savedCost] = 0;
       }
-
-      // console.log("Cheat route found!");
-      // console.log(currentCoord, cheatNb, savedCost);
 
       savedCosts[savedCost]++;
     }
@@ -176,14 +128,11 @@ export const solvePart1 = (input: string) => {
   const start = board.getPositionsByKey("S")[0];
   const end = board.getPositionsByKey("E")[0];
 
-  board.setCell(".", start);
-  board.setCell(".", end);
+  board.setCell(Characters.Dot, start);
+  board.setCell(Characters.Dot, end);
 
-  const graph = constructGraph(board, start);
+  const graph = constructGraphWithCheatingRoutes(board, start);
   const cheatingRoutes = calculateSavingsCheatingRoutes(graph, start);
-
-  // console.log(graph);
-  // console.log(cheatingRoutes);
 
   const saveAtLeast100 = Object.entries(cheatingRoutes)
     .filter(([saveAmount, _]) => Number(saveAmount) >= 100)
@@ -193,5 +142,24 @@ export const solvePart1 = (input: string) => {
 };
 
 export const solvePart2 = (input: string) => {
-  return 0;
+  const board = Board.fromUnparsedBoard(input);
+
+  const start = board.getPositionsByKey("S")[0];
+  const end = board.getPositionsByKey("E")[0];
+
+  board.setCell(Characters.Dot, start);
+  board.setCell(Characters.Dot, end);
+
+  const graph = constructGraphWithCheatingRoutes(board, start, 20);
+  const cheatingRoutes = calculateSavingsCheatingRoutes(graph, start);
+
+  const saveAtLeast100 = Object.entries(cheatingRoutes)
+    .filter(([saveAmount, _]) => Number(saveAmount) >= 100)
+    .reduce((acc, [_, count]) => acc + count, 0);
+
+  const saveAtLeast50 = Object.entries(cheatingRoutes)
+    .filter(([saveAmount, _]) => Number(saveAmount) >= 50)
+    .reduce((acc, [_, count]) => acc + count, 0);
+
+  return { cheatingRoutes, saveAtLeast100, saveAtLeast50 };
 };
