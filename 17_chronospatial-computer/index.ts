@@ -1,5 +1,3 @@
-import chalk from "chalk";
-
 const resolveComboOperand = (operand: number, registers: Registers) => {
   if (operand <= 3) {
     return BigInt(operand);
@@ -40,7 +38,7 @@ const jnz = (literalOperand: number, registers: Registers) => {
   return literalOperand;
 };
 
-const bxc = (operand: number, registers: Registers) => {
+const bxc = (_operand: number, registers: Registers) => {
   registers.B = registers.B ^ registers.C;
 };
 

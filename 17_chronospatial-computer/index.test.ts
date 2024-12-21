@@ -1,7 +1,6 @@
 import { expect } from "jsr:@std/expect";
-import { Programs, solvePart1, solvePart2 } from "./index.ts";
+import { solvePart1, solvePart2 } from "./index.ts";
 import { testWrapper } from "../utils/misc.ts";
-import deno from "https://deno.land/x/y18n@v5.0.0-deno/lib/platform-shims/deno.ts";
 
 let fileInput: string;
 try {
