@@ -56,7 +56,7 @@ testWrapper("Day 18", () => {
     expect(solvePart1(exampleInput, { width: 7, height: 7 }, 21)).toEqual(-1);
   });
 
-  Deno.test("Part 2 - Example input - Find blocking byte", () => {
+  Deno.test.only("Part 2 - Example input - Find blocking byte", () => {
     expect(solvePart2(exampleInput, { width: 7, height: 7 })).toStrictEqual({
       col: 6,
       row: 1,

@@ -26,7 +26,6 @@ export const solvePart1 = (
     const [x, y] = line.split(",").map((x) => Number(x));
     board.setCell(Characters.WhiteRetroBlock, { col: x, row: y });
   }
-  console.log(board.toString());
 
   const start = { col: 0, row: 0 } satisfies Coordinate;
   const end = {
@@ -48,9 +47,6 @@ export const solvePart1 = (
 
   while (!open.isEmpty()) {
     const current = open.dequeue()!;
-    // console.log("----current");
-
-    // console.log(open.list());
     closed.include(current);
 
     for (const nb of board.getNeighbours(current, dpadDirections)) {
@@ -83,8 +79,6 @@ export const solvePart1 = (
     count++;
     current = mem.get(current)!.cameFrom;
   }
-
-  console.log(board.toString());
 
   return count;
 };
