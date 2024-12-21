@@ -1,4 +1,5 @@
 import { BijectiveMap } from "./bijectiveMap.ts";
+import { zip } from "./list.ts";
 
 export const Characters = {
   /**
@@ -40,6 +41,16 @@ export const Characters = {
    * @
    */
   At: "@",
+
+  /**
+   * |
+   */
+  Pipe: "|",
+
+  /**
+   * X
+   */
+  X: "X",
 };
 
 // prettier-ignore
@@ -153,7 +164,7 @@ export class Board<K extends PropertyKey, V extends number> {
     return new Board<string, number>(boardAsStr, width, height);
   }
 
-  constructor(boardAsStr: string, width: number, height: number) {
+  constructor(boardAsStr: string | string[], width: number, height: number) {
     this._board = new Uint8Array(boardAsStr.length);
     this._positionsByKey = {} as Record<K, Coordinate[]>;
     this._width = width;
@@ -306,6 +317,35 @@ export class Board<K extends PropertyKey, V extends number> {
       .filter((coord) =>
         this.isWithinBounds({ col: coord.col, row: coord.row })
       );
+  }
+
+  /**
+   * @TODO
+   */
+  getNeighboursWithDirections(
+    currentCoords: Coordinate,
+    allowlistDirections: Direction[],
+    distance: number = 1
+  ) {
+    const neighboursRelativeCoordinates = allowlistDirections.map((dir) => {
+      const relCoord = relativeCoords[dir];
+      return {
+        col: relCoord.col * distance,
+        row: relCoord.row * distance,
+      };
+    });
+
+    return (
+      zip(
+        neighboursRelativeCoordinates.map((coord) => ({
+          col: coord.col + currentCoords.col,
+          row: coord.row + currentCoords.row,
+        })),
+        allowlistDirections
+      ) as [Coordinate, Direction][]
+    ).filter(([coord, direction]) =>
+      this.isWithinBounds({ col: coord.col, row: coord.row })
+    );
   }
 
   /**
@@ -486,6 +526,20 @@ export const directionArrows = {
   [Direction.E]: "➡️",
   [Direction.S]: "⬇️",
   [Direction.W]: "⬅️",
+};
+
+export const directionArrows2 = {
+  [Direction.N]: "↑",
+  [Direction.E]: "→",
+  [Direction.S]: "↓",
+  [Direction.W]: "←",
+};
+
+export const directionArrows3 = {
+  [Direction.N]: "^",
+  [Direction.E]: ">",
+  [Direction.S]: "v",
+  [Direction.W]: "<",
 };
 
 export const distanceBetweenCoords = (
