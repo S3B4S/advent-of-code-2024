@@ -232,7 +232,7 @@ testWrapper("Day 17", () => {
     expect(solvePart1(fileInput).outcome).toEqual("4,0,4,7,1,2,7,1,6");
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(202322348616234);
   });
 });
