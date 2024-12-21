@@ -33,7 +33,7 @@ export const directionalKeypadInput = `
 +---+---+---+
 `.trim();
 
-export const solvePart1 = (input: string) => {
+export const solve = (input: string, amountOfRobots: number) => {
   const keypad = numericKeypadInput
     .split("\n")
     .filter((_, idx) => isOdd(idx))
@@ -72,7 +72,12 @@ export const solvePart1 = (input: string) => {
   );
 
   const resolved = targets.map((target) => {
-    return resolveToShortestPath([dpadBoard, dpadBoard, numericBoard], target);
+    return resolveToShortestPath(
+      Array.from({ length: amountOfRobots }, () => dpadBoard).concat(
+        numericBoard
+      ),
+      target
+    );
   });
 
   return resolved.reduce(
@@ -80,8 +85,4 @@ export const solvePart1 = (input: string) => {
       sum + shortestPath.length * Number(targets[idx].slice(0, -1)),
     0
   );
-};
-
-export const solvePart2 = (input: string) => {
-  return 0;
 };

@@ -1,10 +1,5 @@
 import { expect } from "jsr:@std/expect";
-import {
-  directionalKeypadInput,
-  numericKeypadInput,
-  solvePart1,
-  solvePart2,
-} from "./index.ts";
+import { directionalKeypadInput, numericKeypadInput, solve } from "./index.ts";
 import { testWrapper } from "../utils/misc.ts";
 import { isOdd } from "../utils/number.ts";
 import { Board, Characters } from "../utils/board.ts";
@@ -23,6 +18,11 @@ try {
   fileInput = "";
 }
 
+const AMOUNT_ROBOTS = {
+  "part-1": 2,
+  "part-2": 25,
+};
+
 const exampleInput = `
 029A
 980A
@@ -33,20 +33,21 @@ const exampleInput = `
 
 testWrapper("Day 21", () => {
   Deno.test("Part 1 - Example input", () => {
-    expect(solvePart1(exampleInput)).toEqual(126384);
+    expect(solve(exampleInput, AMOUNT_ROBOTS["part-1"])).toEqual(126384);
   });
 
   Deno.test("Part 1 - Example input - simpler - 1 input", () => {
-    expect(solvePart1("029A")).toEqual(1972);
+    expect(solve("029A", AMOUNT_ROBOTS["part-1"])).toEqual(1972);
   });
 
   Deno.test("Part 1 - Example input - simpler - 2 inputs", () => {
     expect(
-      solvePart1(
+      solve(
         `
 029A
 980A
-      `.trim()
+      `.trim(),
+        AMOUNT_ROBOTS["part-1"]
       )
     ).toEqual(60772);
   });
@@ -55,7 +56,7 @@ testWrapper("Day 21", () => {
   //     "Part 1 - Example input - simpler - 1 input with ambigious paths",
   //     () => {
   //       expect(
-  //         solvePart1(
+  //         solve(
   //           `
   // 20
   // 02
@@ -67,10 +68,11 @@ testWrapper("Day 21", () => {
 
   Deno.test("Part 1 - Example input - isolate bug", () => {
     expect(
-      solvePart1(
+      solve(
         `
 379A
-      `.trim()
+      `.trim(),
+        AMOUNT_ROBOTS["part-1"]
       )
     ).toEqual(24256);
   });
@@ -204,14 +206,14 @@ testWrapper("Day 21", () => {
   });
 
   Deno.test("Part 1 - File input", () => {
-    expect(solvePart1(fileInput)).toEqual(237342);
+    expect(solve(fileInput, AMOUNT_ROBOTS["part-1"])).toEqual(237342);
   });
 
   Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+    expect(solve(exampleInput, AMOUNT_ROBOTS["part-2"])).toEqual(0);
   });
 
   Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+    expect(solve(fileInput, AMOUNT_ROBOTS["part-2"])).toEqual(0);
   });
 });
