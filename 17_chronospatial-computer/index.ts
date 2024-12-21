@@ -260,10 +260,6 @@ export const solvePart2 = (input: string) => {
 
   let c = 0;
   for (let x = 0; x < 100000000000000; x++) {
-    registers.A = BigInt(x);
-    registers.B = 0n;
-    registers.C = 0n;
-
     for (let k = 0; k < 8; k++) {
       registers.A = BigInt(8 * x + k);
       registers.B = 0n;
@@ -289,8 +285,4 @@ export const solvePart2 = (input: string) => {
   }
 
   return -1;
-};
-
-const dec2bin = (dec: number) => {
-  return (dec >>> 0).toString(2);
 };
