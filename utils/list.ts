@@ -74,3 +74,34 @@ export const detectAmountOfGaps = (list: number[]) => {
 export const zip = <A, B>(a: A[], b: B[]) => {
   return a.map((_, i) => [a[i], b[i]]);
 };
+
+/**
+ * Checks if elements in the list are grouped together
+ * ["A", "A", "B", "C", "D"] -> true
+ * ["A", "B", "C", "D", "A"] -> false
+ * @param list
+ */
+export const properlyGrouped = (list: string[]) => {
+  const known = new Set();
+
+  let current = list[0];
+  known.add(current);
+
+  for (const item of list.slice(1)) {
+    if (item === current) {
+      continue;
+    }
+
+    if (item !== current && !known.has(item)) {
+      known.add(item);
+      current = item;
+      continue;
+    }
+
+    if (item !== current && known.has(item)) {
+      return false;
+    }
+  }
+
+  return true;
+};
