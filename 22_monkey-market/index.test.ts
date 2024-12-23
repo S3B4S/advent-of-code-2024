@@ -27,11 +27,25 @@ testWrapper("Day 22", () => {
     expect(solvePart1(fileInput)).toEqual(15006633487n);
   });
 
-  Deno.test.ignore("Part 2 - Example input", () => {
-    expect(solvePart2(exampleInput)).toEqual(0);
+  // Deno.test.only("Part 2 - [DEBUG] Example input", () => {
+  //   expect(solvePart2("123")).toEqual(37327623n);
+  // });
+
+  Deno.test("Part 2 - Example input", () => {
+    expect(
+      solvePart2(
+        `
+      1
+      2
+      3
+      2024`
+          .trim()
+          .replaceAll(/^ /gm, "")
+      )
+    ).toEqual(23);
   });
 
-  Deno.test.ignore("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+  Deno.test("Part 2 - File input", () => {
+    expect(solvePart2(fileInput)).toEqual(1710);
   });
 });
