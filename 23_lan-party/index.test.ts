@@ -59,6 +59,28 @@ testWrapper("Day 23", () => {
     expect(solvePart2(exampleInput)).toEqual("co,de,ka,ta");
   });
 
+  Deno.test(
+    "Part 2 - Example input - all neighbours have same amount of outgoing edges that is not equal to nodes in clique",
+    () => {
+      expect(
+        solvePart2(
+          `
+a-b
+c-d
+a-c
+b-d
+a-d
+c-b
+x-a
+b-z
+y-c
+d-w
+`.trim()
+        )
+      ).toEqual("a,b,c,d");
+    }
+  );
+
   Deno.test("Part 2 - Example input - should join marked field", () => {
     expect(
       solvePart2(
@@ -132,7 +154,7 @@ y-d
     }
   );
 
-  Deno.test.only(
+  Deno.test(
     "Part 2 - Example input - Bigger field is formed from a part of a second field",
     () => {
       expect(
@@ -148,7 +170,7 @@ a-d
     }
   );
 
-  Deno.test.ignore("Part 2 - File input", () => {
+  Deno.test("Part 2 - File input", () => {
     expect(solvePart2(fileInput)).toEqual(0);
   });
 });

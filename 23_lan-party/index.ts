@@ -95,9 +95,6 @@ type MarkId = string;
 export const solvePart2 = (input: string) => {
   const nodes = new Map<string, GraphNode>();
 
-  const markPerNode = new Map<string, MarkId>();
-  const markedFields = new Map<MarkId, GraphNode[]>();
-
   input
     .trim()
     .split("\n")
@@ -111,78 +108,47 @@ export const solvePart2 = (input: string) => {
       const sndNode = nodes.get(snd)!;
 
       fstNode.addUndirectedNeighbour(sndNode);
-
-      // Edge is between 2 completely new nodes
-      if (!markPerNode.has(fstNode.name) && !markPerNode.has(sndNode.name)) {
-        const markId = `${fstNode.name}-${sndNode.name}` as MarkId;
-
-        markPerNode.set(fstNode.name, markId);
-        markPerNode.set(sndNode.name, markId);
-
-        markedFields.set(markId, [fstNode, sndNode]);
-      }
-
-      // One of the nodes is in the markedFIelds, the other is not
-      if (
-        (markPerNode.has(fstNode.name) && !markPerNode.has(sndNode.name)) ||
-        (markPerNode.has(sndNode.name) && !markPerNode.has(fstNode.name))
-      ) {
-        const [alreadyMarkedNode, newNode] = markPerNode.has(fstNode.name)
-          ? [fstNode, sndNode]
-          : [sndNode, fstNode];
-
-        const markId = markPerNode.get(alreadyMarkedNode.name)!;
-        const allMarkedNodes = markedFields.get(markId)!;
-
-        // Check if the new incoming node has an edge to all marked nodes
-        if (
-          allMarkedNodes.every((markedNode) =>
-            markedNode.outgoing.some((node) => node.name === newNode.name)
-          )
-        ) {
-          // If so, we can add the new node to the markedFields
-          markedFields.set(markId, [...allMarkedNodes, newNode]);
-          markPerNode.set(newNode.name, markId);
-        }
-      }
-
-      // Both nodes are already marked, need to check if we need to merge them
-      if (markPerNode.has(fstNode.name) && markPerNode.has(sndNode.name)) {
-        const markId1 = markPerNode.get(fstNode.name)!;
-        const markId2 = markPerNode.get(sndNode.name)!;
-
-        const field1 = markedFields.get(markId1)!;
-        const field2 = markedFields.get(markId2)!;
-
-        const isAllConnected = field1?.every((node1) => {
-          return field2?.every((node2) =>
-            node2.outgoing.some(
-              (outgoingNode) => outgoingNode.name === node1.name
-            )
-          );
-        });
-
-        if (isAllConnected) {
-          markedFields.set(markId1, [...field1, ...field2]);
-          markedFields.delete(markId2);
-
-          field2.forEach((node) => {
-            markPerNode.set(node.name, markId1);
-          });
-        }
-      }
     });
 
-  // console.log(markedFields);
+  const candidates = [] as GraphNode[][];
+  const skipChecking = new Set<string>();
+  for (const node of [...nodes.values()].toSorted(
+    (a, b) => b.outgoing.length - a.outgoing.length
+  )) {
+    if (node.outgoing.length < 8) continue;
+    if (skipChecking.has(node.name)) continue;
+    const biggestClique = detectCliqueRec([node]);
+    console.log(biggestClique.length);
+    candidates.push(biggestClique);
+    for (const node of biggestClique) {
+      skipChecking.add(node.name);
+    }
+    if (biggestClique.length > 7) break;
+  }
 
-  return markedFields
-    .entries()
-    .reduce(
-      (acc: [MarkId, GraphNode[]], markedField: [MarkId, GraphNode[]]) => {
-        return acc[1].length > markedField[1].length ? acc : markedField;
-      }
-    )[1]
+  return candidates
+    .reduce((acc, curr) => {
+      return acc.length > curr.length ? acc : curr;
+    })
     .map((node) => node.name)
     .toSorted()
     .join(",");
+};
+
+const detectCliqueRec = (nodes: GraphNode[]): GraphNode[] => {
+  const candidates = [];
+  const nodeIds = new Set(nodes.map((node) => node.name));
+  for (const candidate of nodes[0].outgoing) {
+    if (
+      new Set(candidate.outgoing.map((node) => node.name)).isSupersetOf(nodeIds)
+    ) {
+      candidates.push(detectCliqueRec([...nodes, candidate]));
+    }
+  }
+
+  if (candidates.length === 0) return nodes;
+
+  return candidates.reduce((acc, curr) => {
+    return acc.length > curr.length ? acc : curr;
+  });
 };
