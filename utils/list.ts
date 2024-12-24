@@ -105,3 +105,7 @@ export const properlyGrouped = (list: string[]) => {
 
   return true;
 };
+
+export const partition = <T>(predicate: (item: T) => boolean, list: T[]) => {
+  return [list.filter(predicate), list.filter((item) => !predicate(item))];
+};
