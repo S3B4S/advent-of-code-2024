@@ -44,50 +44,39 @@ export const solvePart1 = (input: string) => {
     gates
   );
 
-  console.log(startingCol);
+  const knownValues = startingCol.reduce(
+    (acc, [inputWire1, inputWire2, gate, outputWire]) => {
+      acc[outputWire] = resolveGate(gate, acc[inputWire1], acc[inputWire2]);
+      return acc;
+    },
+    startingWires
+  );
 
-  let remainingGatesMut = [...remainingGates];
-  let prevColOutputs = startingCol.map(([_, _2, _3, output]) => output);
-  const intermediateCols = [];
-
-  let i = 0;
-  while (
-    !remainingGatesMut.every(([_, _2, _3, output]) => output.startsWith("z"))
-  ) {
-    if (i > 0) {
-      break;
+  const remainingGatesMut = [...remainingGates];
+  while (remainingGatesMut.length > 0) {
+    for (const remainingGate of [...remainingGatesMut]) {
+      const [inputWire1, inputWire2, gate, outputWire] = remainingGate;
+      if (
+        knownValues[inputWire1] !== undefined &&
+        knownValues[inputWire2] !== undefined
+      ) {
+        knownValues[outputWire] = resolveGate(
+          gate,
+          knownValues[inputWire1],
+          knownValues[inputWire2]
+        );
+        const index = remainingGatesMut.findIndex(
+          (other) => other[3] === outputWire
+        );
+        if (index !== -1) {
+          remainingGatesMut.splice(index, 1);
+        }
+      }
     }
-    console.log(prevColOutputs);
-    console.log(remainingGatesMut);
-    // Then we repeat with the output gates of prev col for next cols
-    const [col, remaining] = partition(
-      ([inputWire]) => prevColOutputs.includes(inputWire),
-      remainingGates
-    );
-    intermediateCols.push(col);
-    remainingGatesMut = remaining;
-    prevColOutputs = col.map(([_, _2, _3, output]) => output);
-    i++;
   }
-  const cols = [startingCol, ...intermediateCols, remainingGatesMut];
-
-  // Now we can resolve per column
-  const wireValues = cols.reduce((wireValues, col) => {
-    const newWireValues = { ...wireValues };
-    for (const [inputWire1, inputWire2, gate, output] of col) {
-      const calculate = resolveGate(
-        gate,
-        wireValues[inputWire1],
-        wireValues[inputWire2]
-      );
-
-      newWireValues[output] = calculate;
-    }
-    return newWireValues;
-  }, startingWires);
 
   return parseInt(
-    Object.entries(wireValues)
+    Object.entries(knownValues)
       .filter(([wire]) => wire.startsWith("z"))
       .sort((a, b) => b[0].localeCompare(a[0]))
       .reduce((acc, [wire, value]) => {

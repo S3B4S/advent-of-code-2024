@@ -76,7 +76,7 @@ tnw OR pbm -> gnj
 
 testWrapper("Day 24", () => {
   Deno.test("Part 1 - Example input", () => {
-    expect(solvePart1(exampleInput)).toEqual(0);
+    expect(solvePart1(exampleInput)).toEqual(4);
   });
 
   Deno.test("Part 1 - Example input 2", () => {
