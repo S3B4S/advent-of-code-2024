@@ -110,45 +110,39 @@ export const solvePart2 = (input: string) => {
       fstNode.addUndirectedNeighbour(sndNode);
     });
 
-  const candidates = [] as GraphNode[][];
-  const skipChecking = new Set<string>();
-  for (const node of [...nodes.values()].toSorted(
-    (a, b) => b.outgoing.length - a.outgoing.length
-  )) {
-    if (node.outgoing.length < 8) continue;
-    if (skipChecking.has(node.name)) continue;
-    const biggestClique = detectCliqueRec([node]);
-    console.log(biggestClique.length);
-    candidates.push(biggestClique);
-    for (const node of biggestClique) {
-      skipChecking.add(node.name);
-    }
-    if (biggestClique.length > 7) break;
-  }
-
-  return candidates
-    .reduce((acc, curr) => {
-      return acc.length > curr.length ? acc : curr;
-    })
-    .map((node) => node.name)
-    .toSorted()
-    .join(",");
+  const res = bronKerbosch(new Set(), new Set(nodes.keys()), new Set(), nodes);
+  return [...res].toSorted().join(",");
 };
 
-const detectCliqueRec = (nodes: GraphNode[]): GraphNode[] => {
-  const candidates = [];
-  const nodeIds = new Set(nodes.map((node) => node.name));
-  for (const candidate of nodes[0].outgoing) {
-    if (
-      new Set(candidate.outgoing.map((node) => node.name)).isSupersetOf(nodeIds)
-    ) {
-      candidates.push(detectCliqueRec([...nodes, candidate]));
-    }
+const bronKerbosch = (
+  real: Set<string>,
+  candidate: Set<string>,
+  excluded: Set<string>,
+  graph: Map<string, GraphNode>
+) => {
+  if (candidate.size === 0 && excluded.size === 0) {
+    return real;
   }
 
-  if (candidates.length === 0) return nodes;
+  let best = real;
 
-  return candidates.reduce((acc, curr) => {
-    return acc.length > curr.length ? acc : curr;
-  });
+  for (const node of candidate) {
+    const copyReal = new Set(real);
+    copyReal.add(node);
+    const neighbours = new Set(
+      graph.get(node)!.outgoing.map((node) => node.name)
+    );
+    const newCandidates = candidate.intersection(neighbours);
+    const newExcluded = excluded.intersection(neighbours);
+    const result = bronKerbosch(copyReal, newCandidates, newExcluded, graph);
+
+    if (result.size > best.size) {
+      best = result;
+    }
+
+    candidate.delete(node);
+    excluded.add(node);
+  }
+
+  return best;
 };

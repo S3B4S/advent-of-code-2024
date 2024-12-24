@@ -171,6 +171,8 @@ a-d
   );
 
   Deno.test("Part 2 - File input", () => {
-    expect(solvePart2(fileInput)).toEqual(0);
+    expect(solvePart2(fileInput)).toEqual(
+      "az,ed,hz,it,ld,nh,pc,td,ty,ux,wc,yg,zz"
+    );
   });
 });
