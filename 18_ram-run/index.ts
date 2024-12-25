@@ -47,6 +47,7 @@ export const solvePart1 = (
 
   while (!open.isEmpty()) {
     const current = open.dequeue()!;
+
     closed.include(current);
 
     for (const nb of board.getNeighbours(current, dpadDirections)) {
@@ -90,8 +91,6 @@ const heuristic = (end: Coordinate, current: Coordinate) => {
 
 /**
  * @TODO Should do binary search
- * Sorting is with path founds at first, followed up by path not founds
- * Our aim is to find the first path not found
  */
 export const solvePart2 = (
   input: string,
@@ -103,38 +102,13 @@ export const solvePart2 = (
     .split("\n")
     .map((line) => line.split(",").map((x) => Number(x)));
 
-  // i: result keypairs
-  const cache = {} as Record<number, number>;
-  let currentI = nBytes / 2;
-
-  while (true) {
-    if (cache[currentI] !== undefined) {
-      // We've been here before, so move 1 down
-      currentI = currentI - 1;
-      continue;
-    }
-
-    cache[currentI] = solvePart1(input, memorySpace, currentI);
-
-    if (cache[currentI] === -1) {
-      if (cache[currentI - 1] > -1) {
-        // We have found the first path not found!
-        const byte = bytes[currentI - 1];
-        return { col: byte[0], row: byte[1] };
-      } else {
-        // We are too far up in the chain, we need to go down
-        currentI = currentI / 2;
-      }
-    } else {
-      // We are too far down in the chain, we need to go up
-      currentI = (currentI / 2) * 3; // go from 1/2 -> 3/4
+  for (let i = 0; i < nBytes; i++) {
+    const result = solvePart1(input, memorySpace, i);
+    if (result === -1) {
+      const byte = bytes[i - 1];
+      return { col: byte[0], row: byte[1] };
     }
   }
-  //   if (result === -1) {
-  //     const byte = bytes[currentI - 1];
-  //     return { col: byte[0], row: byte[1] };
-  //   }
-  // }
 
-  // return { col: -1, row: -1 };
+  return { col: -1, row: -1 };
 };
