@@ -79,13 +79,13 @@ export const solvePart1 = (input: string) => {
     Object.entries(knownValues)
       .filter(([wire]) => wire.startsWith("z"))
       .sort((a, b) => b[0].localeCompare(a[0]))
-      .reduce((acc, [wire, value]) => {
+      .reduce((acc, [_, value]) => {
         return acc + String(value);
       }, ""),
     2
   );
 };
 
-export const solvePart2 = (input: string) => {
+export const solvePart2 = (_input: string) => {
   return 0;
 };

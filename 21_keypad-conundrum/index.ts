@@ -1,17 +1,7 @@
-import { resolve } from "https://deno.land/std@0.224.0/path/resolve.ts";
-import {
-  Board,
-  Coordinate,
-  Direction,
-  directionArrows3,
-  dpadDirections,
-  stringifyCoord,
-} from "../utils/board.ts";
+import { Board } from "../utils/board.ts";
 import { Characters } from "../utils/board.ts";
-import { HashSet } from "../utils/hashSet.ts";
-import { zip } from "../utils/list.ts";
 import { isOdd } from "../utils/number.ts";
-import { resolveInstructions, resolveToShortestPath } from "./helpers.ts";
+import { resolveToShortestPath } from "./helpers.ts";
 
 export const numericKeypadInput = `
 +---+---+---+

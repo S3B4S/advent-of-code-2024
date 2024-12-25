@@ -17,17 +17,6 @@ const parseMap = (map: string) => {
   return { isLock, countFillPerCol };
 };
 
-const calcCounterPart = (
-  countFillPerCol: Record<number, number>,
-  maxColLength: number
-) => {
-  const counterPart = {} as Record<number, number>;
-  for (let col = 0; col < Object.keys(countFillPerCol).length; col++) {
-    counterPart[col] = maxColLength - countFillPerCol[col];
-  }
-  return counterPart;
-};
-
 export const solvePart1 = (input: string) => {
   // Record<stringified countFillPerCol, isLock>
   const memLocks = {} as Record<string, Record<number, number>>;
@@ -66,6 +55,6 @@ export const solvePart1 = (input: string) => {
   return count;
 };
 
-export const solvePart2 = (input: string) => {
+export const solvePart2 = (_input: string) => {
   return 0;
 };

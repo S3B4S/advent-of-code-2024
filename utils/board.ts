@@ -343,7 +343,7 @@ export class Board<K extends PropertyKey, V extends number> {
         })),
         allowlistDirections
       ) as [Coordinate, Direction][]
-    ).filter(([coord, direction]) =>
+    ).filter(([coord, _]) =>
       this.isWithinBounds({ col: coord.col, row: coord.row })
     );
   }

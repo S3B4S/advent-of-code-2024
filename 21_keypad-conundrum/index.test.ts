@@ -90,27 +90,10 @@ testWrapper("Day 21", () => {
         return chars;
       });
 
-    const directionalKeypad = directionalKeypadInput
-      .split("\n")
-      .filter((_, idx) => isOdd(idx))
-      .map((line) =>
-        line
-          .slice(2)
-          .slice(0, -2)
-          .split(" | ")
-          .map((char) => (char === Characters.Space ? Characters.X : char))
-      );
-
     const numericBoard = new Board(
       keypad.flat(1),
       keypad[0].length,
       keypad.length
-    );
-
-    const dpadBoard = new Board(
-      directionalKeypad.flat(1),
-      directionalKeypad[0].length,
-      directionalKeypad.length
     );
 
     expect(
@@ -176,27 +159,10 @@ testWrapper("Day 21", () => {
         return chars;
       });
 
-    const directionalKeypad = directionalKeypadInput
-      .split("\n")
-      .filter((_, idx) => isOdd(idx))
-      .map((line) =>
-        line
-          .slice(2)
-          .slice(0, -2)
-          .split(" | ")
-          .map((char) => (char === Characters.Space ? Characters.X : char))
-      );
-
     const numericBoard = new Board(
       keypad.flat(1),
       keypad[0].length,
       keypad.length
-    );
-
-    const dpadBoard = new Board(
-      directionalKeypad.flat(1),
-      directionalKeypad[0].length,
-      directionalKeypad.length
     );
 
     expect(resolveInstructions(numericBoard, ["20", "02"])).toStrictEqual({
